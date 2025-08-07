@@ -34,5 +34,5 @@ $router->post('/api/auth/logout', function() use ($authController) {
 });
 
 // Handle the request
-$router->dispatch();
+$router->handleRequest();
 ?>
