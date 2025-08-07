@@ -76,9 +76,14 @@
                         <p>Please sign in to continue</p>
                     </div>
 
-                    <div id="alert-container"></div>
+                    <?php if (isset($error)): ?>
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <?= htmlspecialchars($error) ?>
+                        </div>
+                    <?php endif; ?>
 
-                    <form id="loginForm">
+                    <form action="<?= dirname($_SERVER['SCRIPT_NAME']) ?>/api/auth/login" method="POST">
                         <div class="mb-3">
                             <label for="school_id" class="form-label">School ID</label>
                             <input type="text" class="form-control" id="school_id" name="school_id" required>
@@ -104,73 +109,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            
-            // Get the current path and construct the API URL
-            const currentPath = window.location.pathname;
-            // Remove '/login' from the path to get the base
-            const basePath = currentPath.replace('/login', '');
-            const apiUrl = basePath + '/api/auth/login';
-            
-            // Debug: Log the paths
-            console.log('Current path:', currentPath);
-            console.log('Base path:', basePath);
-            console.log('API URL:', apiUrl);
-            
-            fetch(apiUrl, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                const alertContainer = document.getElementById('alert-container');
-                
-                if (data.status === 'success') {
-                    // Show success message
-                    alertContainer.innerHTML = `
-                        <div class="alert alert-success">
-                            ${data.message}
-                        </div>
-                    `;
-                    
-                    // Redirect based on role
-                    setTimeout(() => {
-                        switch(data.role) {
-                            case 'admin':
-                                window.location.href = basePath + '/admin/dashboard';
-                                break;
-                            case 'faculty':
-                                window.location.href = basePath + '/faculty-success';
-                                break;
-                            case 'student':
-                                window.location.href = basePath + '/student-success';
-                                break;
-                            default:
-                                window.location.href = basePath + '/';
-                        }
-                    }, 1000);
-                } else {
-                    // Show error message
-                    alertContainer.innerHTML = `
-                        <div class="alert alert-danger">
-                            ${data.message}
-                        </div>
-                    `;
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('alert-container').innerHTML = `
-                    <div class="alert alert-danger">
-                        An error occurred. Please try again.
-                    </div>
-                `;
-            });
-        });
-    </script>
+</body>
+</html>
 </body>
 </html>

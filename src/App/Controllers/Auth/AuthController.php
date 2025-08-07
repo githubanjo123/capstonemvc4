@@ -36,19 +36,9 @@ class AuthController
      */
     public function login()
     {
-        // Set headers for JSON response
-        header('Content-Type: application/json');
-        header('Access-Control-Allow-Origin: *');
-        header('Access-Control-Allow-Methods: POST');
-        header('Access-Control-Allow-Headers: Content-Type');
-
         // Only accept POST requests
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405);
-            echo json_encode([
-                'status' => 'error',
-                'message' => 'Invalid request method.'
-            ]);
+            $this->showLoginError('Invalid request method.');
             return;
         }
 
@@ -57,34 +47,34 @@ class AuthController
             $school_id = $_POST['school_id'] ?? '';
             $password = $_POST['password'] ?? '';
 
+            // Validate input
+            if (empty($school_id) || empty($password)) {
+                $this->showLoginError('School ID and password are required.');
+                return;
+            }
+
             // Use AuthService for login
             $result = $this->authService->login($school_id, $password);
 
             if ($result['success']) {
-                // Return successful login response
-                http_response_code(200);
-                echo json_encode([
-                    'status' => 'success',
-                    'message' => $result['message'],
-                    'role' => $result['user']['role'],
-                    'user' => $result['user']
-                ]);
+                // Redirect based on role
+                $this->redirectToDashboard($result['user']['role']);
             } else {
-                // Return error message if credentials are incorrect
-                http_response_code(401);
-                echo json_encode([
-                    'status' => 'fail',
-                    'message' => $result['message']
-                ]);
+                // Show error message
+                $this->showLoginError($result['message']);
             }
         } catch (\Exception $e) {
             // Handle any unexpected errors
-            http_response_code(500);
-            echo json_encode([
-                'status' => 'error',
-                'message' => 'An error occurred during login.'
-            ]);
+            $this->showLoginError('An error occurred during login.');
         }
+    }
+
+    /**
+     * Show login page with error
+     */
+    private function showLoginError($message)
+    {
+        $this->view->display('auth.login', ['error' => $message]);
     }
 
     /**
@@ -107,18 +97,22 @@ class AuthController
      */
     private function redirectToDashboard($role)
     {
+        // Get the base path for correct redirect
+        $scriptName = $_SERVER['SCRIPT_NAME'];
+        $basePath = dirname($scriptName);
+        
         switch ($role) {
             case 'admin':
-                header('Location: /admin/dashboard');
+                header('Location: ' . $basePath . '/admin/dashboard');
                 break;
             case 'faculty':
-                header('Location: /faculty/dashboard');
+                header('Location: ' . $basePath . '/faculty-success');
                 break;
             case 'student':
-                header('Location: /student/dashboard');
+                header('Location: ' . $basePath . '/student-success');
                 break;
             default:
-                header('Location: /login');
+                header('Location: ' . $basePath . '/login');
         }
         exit;
     }
