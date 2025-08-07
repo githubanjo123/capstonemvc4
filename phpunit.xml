@@ -1,29 +1,28 @@
-<phpunit>
-    <php>
-        <ini name="error_reporting" value="-1"/>
-    </php>
-    <bootstrap>vendor/autoload.php</bootstrap>
-    <testsuites>
-        <testsuite name="Unit Tests">
-            <directory>./tests/Unit</directory>
-        </testsuite>
-        <testsuite name="Integration Tests">
-            <directory>./tests/Integration</directory>
-        </testsuite>
-        <testsuite name="DAO Tests">
-            <directory>./tests/Unit/DAO</directory>
-        </testsuite>
-        <testsuite name="TDD Test Suite">
-            <directory>./tests</directory>
-        </testsuite>
-    </testsuites>
-    <filter>
-        <whitelist>
-            <directory suffix=".php">src/</directory>
-        </whitelist>
-    </filter>
-    <logging>
-        <log type="coverage-html" target="tests/coverage"/>
-        <log type="coverage-text" target="php://stdout" showUncoveredFiles="true"/>
-    </logging>
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         verbose="true">
+
+  <php>
+    <ini name="error_reporting" value="-1"/>
+    <env name="APP_ENV" value="testing"/>
+  </php>
+
+  <testsuites>
+    <testsuite name="Unit Tests">
+      <directory>tests/Unit</directory>
+    </testsuite>
+    <testsuite name="Integration Tests">
+      <directory>tests/Integration</directory>
+    </testsuite>
+  </testsuites>
+
+  <coverage processUncoveredFiles="true">
+    <include>
+      <directory suffix=".php">src</directory>
+    </include>
+  </coverage>
+
 </phpunit>

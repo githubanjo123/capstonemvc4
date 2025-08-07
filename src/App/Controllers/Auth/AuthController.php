@@ -114,6 +114,6 @@ class AuthController
             default:
                 header('Location: ' . $basePath . '/login');
         }
-        exit;
+        return;
     }
 }

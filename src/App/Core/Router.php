@@ -23,6 +23,22 @@ class Router
     }
 
     /**
+     * Add a PUT route
+     */
+    public function put($path, $callback)
+    {
+        $this->routes['PUT'][$path] = $callback;
+    }
+
+    /**
+     * Add a DELETE route
+     */
+    public function delete($path, $callback)
+    {
+        $this->routes['DELETE'][$path] = $callback;
+    }
+
+    /**
      * Add routes for all HTTP methods
      */
     public function any($path, $callback)
@@ -34,7 +50,7 @@ class Router
     }
 
     /**
-     * Handle the current request
+     * Handle the current request (legacy)
      */
     public function handleRequest()
     {
@@ -78,6 +94,50 @@ class Router
     }
 
     /**
+     * Dispatch based on current globals and echo handler return
+     */
+    public function dispatch()
+    {
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+
+        $path = rtrim($path, '/');
+        if ($path === '') {
+            $path = '/';
+        }
+
+        $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+        $subdirectory = dirname($scriptName);
+        if ($subdirectory !== '/' && $subdirectory !== '.' && strpos($path, $subdirectory) === 0) {
+            $path = substr($path, strlen($subdirectory));
+            if ($path === '') {
+                $path = '/';
+            }
+        }
+
+        if (isset($this->routes[$method][$path])) {
+            $callback = $this->routes[$method][$path];
+            $result = $this->invoke($callback, []);
+            if ($result !== null) {
+                echo $result;
+            }
+            return;
+        }
+
+        $matchedRoute = $this->findParameterizedRoute($method, $path);
+        if ($matchedRoute) {
+            $result = $this->invoke($matchedRoute['callback'], $matchedRoute['params']);
+            if ($result !== null) {
+                echo $result;
+            }
+            return;
+        }
+
+        http_response_code(404);
+        echo '404 Not Found';
+    }
+
+    /**
      * Find parameterized route
      */
     private function findParameterizedRoute($method, $path)
@@ -110,7 +170,7 @@ class Router
     }
 
     /**
-     * Execute callback with parameters
+     * Execute callback with parameters (legacy)
      */
     private function executeCallback($callback, $params = [])
     {
@@ -136,7 +196,27 @@ class Router
     }
 
     /**
-     * Handle 404 Not Found
+     * Invoke callback and return result
+     */
+    private function invoke($callback, array $params)
+    {
+        if (is_callable($callback)) {
+            return call_user_func_array($callback, $params);
+        }
+        if (is_string($callback) && strpos($callback, '@') !== false) {
+            list($controller, $method) = explode('@', $callback);
+            if (class_exists($controller)) {
+                $instance = new $controller();
+                if (method_exists($instance, $method)) {
+                    return call_user_func_array([$instance, $method], $params);
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Handle 404 Not Found (legacy JSON)
      */
     private function notFound()
     {

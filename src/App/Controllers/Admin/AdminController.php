@@ -60,7 +60,7 @@ class AdminController
             $loginUrl = $basePath . '/login';
             
             header('Location: ' . $loginUrl);
-            exit;
+            return;
         } else {
             // Show confirmation page
             $this->showLogoutConfirmation();
@@ -119,7 +119,7 @@ class AdminController
             </div>
         </body>
         </html>';
-        exit;
+        return;
     }
 
 
