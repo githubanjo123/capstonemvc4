@@ -2,16 +2,16 @@
 
 namespace App\Controllers\Auth;
 
-use App\Services\AuthService;
+use App\Interfaces\AuthServiceInterface;
 use App\Core\View;
 
 class AuthController
 {
     private $authService;
 
-    public function __construct()
+    public function __construct(AuthServiceInterface $authService)
     {
-        $this->authService = new AuthService();
+        $this->authService = $authService;
     }
 
     /**
@@ -86,50 +86,11 @@ class AuthController
     }
 
     /**
-     * Check if user is authenticated
+     * Show login page
      */
-    public function checkAuth()
+    public function showLogin()
     {
-        return $this->authService->isAuthenticated();
-    }
-
-    /**
-     * Get current user data
-     */
-    public function getCurrentUser()
-    {
-        return $this->authService->getCurrentUser();
-    }
-
-    /**
-     * Require authentication middleware
-     */
-    public function requireAuth()
-    {
-        $result = $this->authService->requireAuth();
-        if (!$result['success']) {
-            http_response_code(401);
-            echo json_encode([
-                'status' => 'error',
-                'message' => $result['message']
-            ]);
-            exit;
-        }
-    }
-
-    /**
-     * Require specific role
-     */
-    public function requireRole($requiredRole)
-    {
-        $result = $this->authService->requireRole($requiredRole);
-        if (!$result['success']) {
-            http_response_code(403);
-            echo json_encode([
-                'status' => 'error',
-                'message' => $result['message']
-            ]);
-            exit;
-        }
+        $view = new View();
+        $view->display('auth.login');
     }
 }

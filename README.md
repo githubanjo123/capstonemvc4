@@ -1,37 +1,24 @@
 # Examination System with AI Essay Checker
 
-A comprehensive web-based examination system built with PHP using DAO architecture. The system supports three user roles (Admin, Faculty, Student) and includes automated scoring with AI essay checking capabilities.
+A comprehensive web-based examination system built with PHP using MVC-DAO-Service architecture with interfaces. The system currently focuses on authentication with support for three user roles (Admin, Faculty, Student).
 
 ## 🚀 Features
 
-### Admin Features
-- **User Management**: Add, edit, and delete students and faculty
-- **Subject Management**: Create and manage subjects, assign faculty to subjects
-- **Result Viewing**: View all exam results across the system
-- **Report Generation**: Generate comprehensive reports
-
-### Faculty Features
-- **Exam Creation**: Create exams with multiple question types
-- **Question Management**: Add, edit, and delete questions (Multiple Choice, True/False, Essay)
-- **Time Limit Management**: Set and modify exam time limits
-- **Result Viewing**: View detailed results for their exams
-
-### Student Features
-- **Exam Taking**: Take exams with real-time timer
-- **Multiple Question Types**: Support for Multiple Choice, True/False, and Essay questions
-- **Auto-Scoring**: Automatic scoring for MCQ and T/F questions
-- **AI Essay Checking**: Automated essay grading with AI analysis
-- **Result Viewing**: View personal exam results and scores
+### Authentication Features
+- **Secure Login**: Role-based authentication system
+- **Session Management**: Secure session handling
+- **Role Support**: Admin, Faculty, and Student roles
+- **Dependency Injection**: Interface-based architecture
 
 ## 🛠 Technical Features
 
-- **DAO Architecture**: Clean separation of concerns with organized layers
+- **MVC-DAO-Service Architecture**: Interface-based architecture with dependency injection
 - **Role-Based Access Control**: Secure access based on user roles
 - **Session Management**: Secure session handling
 - **Database Integration**: MySQL database with proper relationships
 - **Responsive Design**: Bootstrap-based responsive UI
 - **Real-time Timer**: JavaScript-based exam timer
-- **AI Essay Grading**: Mock AI implementation for essay scoring
+- **Dependency Injection**: Interface-based service resolution
 
 ## 📋 Requirements
 
@@ -126,14 +113,14 @@ examination-system/
 ├── src/                   # Application source code
 │   └── App/
 │       ├── Config/        # Configuration files
+│       ├── Interfaces/    # Service and DAO interfaces
 │       ├── DAO/           # Data Access Objects
+│       │   └── Impl/      # DAO implementations
 │       ├── Controllers/   # Controllers organized by feature
-│       │   ├── Auth/      # Authentication controllers
-│       │   ├── Admin/     # Admin controllers
-│       │   ├── Faculty/   # Faculty controllers
-│       │   └── Student/   # Student controllers
-│       ├── Core/          # Core framework classes
+│       │   └── Auth/      # Authentication controllers
 │       ├── Services/      # Business logic services
+│       │   └── Impl/      # Service implementations
+│       ├── Core/          # Core framework classes
 │       └── Views/         # View templates
 ├── vendor/                # Composer dependencies
 ├── tests/                 # Unit tests
@@ -141,30 +128,26 @@ examination-system/
 └── composer.json          # Composer configuration
 ```
 
-### DAO Pattern Implementation
+### Interface-Based Architecture
 
-#### DAO Layer (Data Access Objects)
-- `UserDAO.php` - User database operations
-- `ExamDAO.php` - Exam database operations
-- `QuestionDAO.php` - Question database operations
-- `SubjectDAO.php` - Subject database operations
-- `ExamAttemptDAO.php` - Exam attempt database operations
-- `StudentAnswerDAO.php` - Student answer database operations
+#### Interfaces
+- `UserDAOInterface.php` - User data access contract
+- `AuthServiceInterface.php` - Authentication service contract
 
-#### Services (Business Logic Layer)
-- `AuthService.php` - Authentication and authorization
-- `ExamService.php` - Exam creation, grading, and AI essay checking
+#### DAO Layer (Implementations)
+- `UserDAOImpl.php` - User database operations implementation
+
+#### Services Layer (Implementations)
+- `AuthServiceImpl.php` - Authentication business logic implementation
 
 #### Controllers (Request Handling)
-- `Auth/AuthController.php` - Login/logout handling
-- `Admin/AdminController.php` - Admin-specific actions
-- `Faculty/FacultyController.php` - Faculty-specific actions
-- `Student/StudentController.php` - Student-specific actions
+- `Auth/AuthController.php` - Login/logout handling with dependency injection
 
 #### Views (Presentation Layer)
-- Layout templates with Bootstrap styling
-- Role-specific dashboards
-- Exam interfaces with real-time timer
+- `auth/login.php` - Login interface with Bootstrap styling
+
+#### Dependency Injection
+- `Core/Container.php` - Service container for dependency resolution
 
 ## 🔐 Security Features
 
@@ -174,36 +157,37 @@ examination-system/
 - **SQL Injection Prevention**: Prepared statements
 - **CSRF Protection**: Form token validation (recommended enhancement)
 
-## 🤖 AI Essay Checker
+## 🔧 Interface-Based Architecture
 
-The system includes a mock AI essay checker that evaluates essays based on:
-- **Length Analysis**: Evaluates response length
-- **Keyword Matching**: Checks for relevant keywords
-- **Structure Scoring**: Basic grammar and structure assessment
+The system uses interfaces and dependency injection for better testability and maintainability:
 
-### Implementation Details
+### Interface Contracts
 ```php
-private function gradeEssay($studentAnswer, $referenceAnswer)
-{
-    // Length factor (0-30 points)
-    $length = strlen($studentAnswer);
-    if ($length >= 100) {
-        $score += 30;
-    } elseif ($length >= 50) {
-        $score += 20;
-    } elseif ($length >= 25) {
-        $score += 10;
+interface UserDAOInterface {
+    public function findBySchoolId(string $school_id): ?array;
+    public function authenticate(string $school_id, string $password): ?array;
+}
+
+interface AuthServiceInterface {
+    public function login(string $school_id, string $password): array;
+    public function logout(): array;
+    public function isAuthenticated(): bool;
+}
+```
+
+### Dependency Injection
+```php
+class Container {
+    public function registerServices() {
+        $this->services[UserDAOInterface::class] = function() {
+            return new UserDAOImpl();
+        };
+        
+        $this->services[AuthServiceInterface::class] = function() {
+            $userDAO = $this->get(UserDAOInterface::class);
+            return new AuthServiceImpl($userDAO);
+        };
     }
-
-    // Keyword matching (0-40 points)
-    $keywords = explode(' ', strtolower($referenceAnswer));
-    $studentWords = explode(' ', strtolower($studentAnswer));
-    // ... keyword matching logic
-
-    // Grammar and structure (0-30 points)
-    $score += 20; // Mock score
-
-    return min(100, max(0, round($score)));
 }
 ```
 

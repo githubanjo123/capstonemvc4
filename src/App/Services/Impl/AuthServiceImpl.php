@@ -1,22 +1,23 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Impl;
 
-use App\DAO\UserDAO;
+use App\Interfaces\AuthServiceInterface;
+use App\Interfaces\UserDAOInterface;
 
-class AuthService
+class AuthServiceImpl implements AuthServiceInterface
 {
     private $userDAO;
 
-    public function __construct()
+    public function __construct(UserDAOInterface $userDAO)
     {
-        $this->userDAO = new UserDAO();
+        $this->userDAO = $userDAO;
     }
 
     /**
-     * Authenticate user login
+     * Login user with school ID and password
      */
-    public function login($school_id, $password)
+    public function login(string $school_id, string $password): array
     {
         // Validate inputs
         if (empty($school_id) || empty($password)) {
@@ -40,17 +41,18 @@ class AuthService
             ];
         }
 
-        // Start session and store user data
+        // Start session
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
 
+        // Store user data in session
         $_SESSION['user_id'] = $user['user_id'];
         $_SESSION['school_id'] = $user['school_id'];
         $_SESSION['full_name'] = $user['full_name'];
         $_SESSION['role'] = $user['role'];
-        $_SESSION['year_level'] = $user['year_level'];
-        $_SESSION['section'] = $user['section'];
+        $_SESSION['year_level'] = $user['year_level'] ?? null;
+        $_SESSION['section'] = $user['section'] ?? null;
 
         return [
             'success' => true,
@@ -60,23 +62,22 @@ class AuthService
                 'school_id' => $user['school_id'],
                 'full_name' => $user['full_name'],
                 'role' => $user['role'],
-                'year_level' => $user['year_level'],
-                'section' => $user['section']
+                'year_level' => $user['year_level'] ?? null,
+                'section' => $user['section'] ?? null
             ]
         ];
     }
 
     /**
-     * Logout user
+     * Logout current user
      */
-    public function logout()
+    public function logout(): array
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
 
-        // Clear all session data
-        session_unset();
+        // Destroy session
         session_destroy();
 
         return [
@@ -88,7 +89,7 @@ class AuthService
     /**
      * Check if user is authenticated
      */
-    public function isAuthenticated()
+    public function isAuthenticated(): bool
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
@@ -100,7 +101,7 @@ class AuthService
     /**
      * Get current user data
      */
-    public function getCurrentUser()
+    public function getCurrentUser(): ?array
     {
         if (!$this->isAuthenticated()) {
             return null;
@@ -117,18 +118,9 @@ class AuthService
     }
 
     /**
-     * Check if user has required role
+     * Require authentication
      */
-    public function hasRole($requiredRole)
-    {
-        $user = $this->getCurrentUser();
-        return $user && $user['role'] === $requiredRole;
-    }
-
-    /**
-     * Require authentication middleware
-     */
-    public function requireAuth()
+    public function requireAuth(): array
     {
         if (!$this->isAuthenticated()) {
             return [
@@ -138,27 +130,34 @@ class AuthService
             ];
         }
 
-        return ['success' => true];
+        return [
+            'success' => true,
+            'message' => 'User is authenticated.'
+        ];
     }
 
     /**
-     * Require specific role middleware
+     * Require specific role
      */
-    public function requireRole($requiredRole)
+    public function requireRole(string $requiredRole): array
     {
         $authResult = $this->requireAuth();
         if (!$authResult['success']) {
             return $authResult;
         }
 
-        if (!$this->hasRole($requiredRole)) {
+        $user = $this->getCurrentUser();
+        if ($user['role'] !== $requiredRole) {
             return [
                 'success' => false,
                 'message' => 'Insufficient permissions.',
-                'redirect' => '/dashboard'
+                'redirect' => '/login'
             ];
         }
 
-        return ['success' => true];
+        return [
+            'success' => true,
+            'message' => 'User has required role.'
+        ];
     }
 }
