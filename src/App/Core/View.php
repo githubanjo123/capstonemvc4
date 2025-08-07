@@ -100,7 +100,16 @@ class View
      */
     public function display($view, $data = [])
     {
-        echo $this->render($view, $data);
+        $content = $this->render($view, $data);
+        
+        // Check if layout is specified in the view
+        if (isset($data['layout']) || (isset($GLOBALS['layout']) && $GLOBALS['layout'])) {
+            $layout = $data['layout'] ?? $GLOBALS['layout'];
+            $data['content'] = $content;
+            echo $this->renderWithLayout($layout, $content, $data);
+        } else {
+            echo $content;
+        }
     }
 
     /**

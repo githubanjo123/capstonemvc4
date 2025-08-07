@@ -50,20 +50,65 @@ class Router
         // Check if route exists
         if (isset($this->routes[$method][$path])) {
             $callback = $this->routes[$method][$path];
+            $this->executeCallback($callback);
+        } else {
+            // Check for parameterized routes
+            $matchedRoute = $this->findParameterizedRoute($method, $path);
+            if ($matchedRoute) {
+                $this->executeCallback($matchedRoute['callback'], $matchedRoute['params']);
+            } else {
+                $this->notFound();
+            }
+        }
+    }
+
+    /**
+     * Find parameterized route
+     */
+    private function findParameterizedRoute($method, $path)
+    {
+        if (!isset($this->routes[$method])) {
+            return null;
+        }
+
+        foreach ($this->routes[$method] as $route => $callback) {
+            $pattern = $this->convertRouteToPattern($route);
+            if (preg_match($pattern, $path, $matches)) {
+                array_shift($matches); // Remove the full match
+                return [
+                    'callback' => $callback,
+                    'params' => $matches
+                ];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Convert route to regex pattern
+     */
+    private function convertRouteToPattern($route)
+    {
+        $pattern = preg_replace('/\{([^}]+)\}/', '([^/]+)', $route);
+        return '#^' . $pattern . '$#';
+    }
+
+    /**
+     * Execute callback with parameters
+     */
+    private function executeCallback($callback, $params = [])
+    {
+        if (is_callable($callback)) {
+            call_user_func_array($callback, $params);
+        } elseif (is_string($callback) && strpos($callback, '@') !== false) {
+            // Handle Controller@method format
+            list($controller, $method) = explode('@', $callback);
             
-            if (is_callable($callback)) {
-                call_user_func($callback);
-            } elseif (is_string($callback) && strpos($callback, '@') !== false) {
-                // Handle Controller@method format
-                list($controller, $method) = explode('@', $callback);
-                
-                if (class_exists($controller)) {
-                    $instance = new $controller();
-                    if (method_exists($instance, $method)) {
-                        call_user_func([$instance, $method]);
-                    } else {
-                        $this->notFound();
-                    }
+            if (class_exists($controller)) {
+                $instance = new $controller();
+                if (method_exists($instance, $method)) {
+                    call_user_func_array([$instance, $method], $params);
                 } else {
                     $this->notFound();
                 }
