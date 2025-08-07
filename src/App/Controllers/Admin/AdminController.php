@@ -46,14 +46,75 @@ class AdminController
      */
     public function logout()
     {
-        $this->authService->logout();
-        
-        // Get the base path for correct redirect
+        // Check if user confirmed logout
+        if (isset($_GET['confirm']) && $_GET['confirm'] === 'true') {
+            $this->authService->logout();
+            
+            // Get the base path for correct redirect
+            $scriptName = $_SERVER['SCRIPT_NAME'];
+            $basePath = dirname($scriptName);
+            $loginUrl = $basePath . '/login';
+            
+            header('Location: ' . $loginUrl);
+            exit;
+        } else {
+            // Show confirmation page
+            $this->showLogoutConfirmation();
+        }
+    }
+
+    /**
+     * Show logout confirmation page
+     */
+    private function showLogoutConfirmation()
+    {
         $scriptName = $_SERVER['SCRIPT_NAME'];
         $basePath = dirname($scriptName);
-        $loginUrl = $basePath . '/login';
+        $logoutUrl = $basePath . '/admin/logout?confirm=true';
+        $dashboardUrl = $basePath . '/admin/dashboard';
         
-        header('Location: ' . $loginUrl);
+        echo '<!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Confirm Logout - Admin Dashboard</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        </head>
+        <body class="bg-light">
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="card shadow">
+                            <div class="card-header bg-warning text-white">
+                                <h4 class="mb-0">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    Confirm Logout
+                                </h4>
+                            </div>
+                            <div class="card-body text-center">
+                                <i class="fas fa-sign-out-alt fa-3x text-warning mb-3"></i>
+                                <h5>Are you sure you want to logout?</h5>
+                                <p class="text-muted">You will be redirected to the login page.</p>
+                                
+                                <div class="mt-4">
+                                    <a href="' . $logoutUrl . '" class="btn btn-warning me-2">
+                                        <i class="fas fa-sign-out-alt me-2"></i>
+                                        Yes, Logout
+                                    </a>
+                                    <a href="' . $dashboardUrl . '" class="btn btn-secondary">
+                                        <i class="fas fa-times me-2"></i>
+                                        Cancel
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>';
         exit;
     }
 
