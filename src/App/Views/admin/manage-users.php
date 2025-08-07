@@ -51,7 +51,7 @@
     foreach ($yearSections as $yearSection => $count): 
         $sectionId = 'section-' . str_replace(' ', '-', strtolower($yearSection));
         $sectionStudents = array_filter($students, function($student) use ($yearSection) {
-            return ($student['year'] . ' ' . $student['section']) === $yearSection;
+            return ($student['year_level'] . ' ' . $student['section']) === $yearSection;
         });
     ?>
         <div class="student-section <?= $firstSection ? 'active' : '' ?>" 
@@ -80,11 +80,11 @@
                         <div class="col-md-8">
                             <div class="student-name">
                                 <i class="fas fa-user-graduate me-2"></i>
-                                <?= htmlspecialchars($student['name']) ?>
+                                <?= htmlspecialchars($student['full_name']) ?>
                             </div>
                             <div class="student-email">
-                                <i class="fas fa-envelope me-2"></i>
-                                <?= htmlspecialchars($student['email']) ?>
+                                <i class="fas fa-id-card me-2"></i>
+                                <?= htmlspecialchars($student['school_id']) ?>
                             </div>
                             <div class="student-date">
                                 <i class="fas fa-calendar me-2"></i>
@@ -92,11 +92,11 @@
                             </div>
                         </div>
                         <div class="col-md-4 text-end">
-                            <button class="btn btn-edit me-2" onclick="editStudent(<?= $student['id'] ?>)">
+                            <button class="btn btn-edit me-2" onclick="editStudent(<?= $student['user_id'] ?>)">
                                 <i class="fas fa-edit me-1"></i>
                                 Edit
                             </button>
-                            <button class="btn btn-delete" onclick="deleteStudent(<?= $student['id'] ?>)">
+                            <button class="btn btn-delete" onclick="deleteStudent(<?= $student['user_id'] ?>)">
                                 <i class="fas fa-trash me-1"></i>
                                 Delete
                             </button>
@@ -139,24 +139,23 @@
                 <div class="col-md-8">
                     <div class="student-name">
                         <i class="fas fa-user-tie me-2"></i>
-                        <?= htmlspecialchars($facultyMember['name']) ?>
+                        <?= htmlspecialchars($facultyMember['full_name']) ?>
                     </div>
                     <div class="student-email">
-                        <i class="fas fa-envelope me-2"></i>
-                        <?= htmlspecialchars($facultyMember['email']) ?>
+                        <i class="fas fa-id-card me-2"></i>
+                        <?= htmlspecialchars($facultyMember['school_id']) ?>
                     </div>
                     <div class="student-date">
-                        <i class="fas fa-building me-2"></i>
-                        <?= htmlspecialchars($facultyMember['department']) ?> • 
+                        <i class="fas fa-calendar me-2"></i>
                         Added on <?= date('M d, Y', strtotime($facultyMember['created_at'])) ?>
                     </div>
                 </div>
                 <div class="col-md-4 text-end">
-                    <button class="btn btn-edit me-2" onclick="editFaculty(<?= $facultyMember['id'] ?>)">
+                    <button class="btn btn-edit me-2" onclick="editFaculty(<?= $facultyMember['user_id'] ?>)">
                         <i class="fas fa-edit me-1"></i>
                         Edit
                     </button>
-                    <button class="btn btn-delete" onclick="deleteFaculty(<?= $facultyMember['id'] ?>)">
+                    <button class="btn btn-delete" onclick="deleteFaculty(<?= $facultyMember['user_id'] ?>)">
                         <i class="fas fa-trash me-1"></i>
                         Delete
                     </button>
