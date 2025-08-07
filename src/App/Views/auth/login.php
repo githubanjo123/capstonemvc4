@@ -141,7 +141,7 @@
                     setTimeout(() => {
                         switch(data.role) {
                             case 'admin':
-                                window.location.href = basePath + '/admin-success';
+                                window.location.href = basePath + '/admin/dashboard';
                                 break;
                             case 'faculty':
                                 window.location.href = basePath + '/faculty-success';
