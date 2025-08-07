@@ -70,6 +70,19 @@ $router->get('/admin/logout', function() use ($adminController) {
     $adminController->logout();
 });
 
+// Admin User Management Routes
+$router->post('/admin/users/add', function() use ($adminController) {
+    $adminController->addUser();
+});
+
+$router->post('/admin/users/edit/{id}', function($id) use ($adminController) {
+    $adminController->editUser($id);
+});
+
+$router->post('/admin/users/delete/{id}', function($id) use ($adminController) {
+    $adminController->deleteUser($id);
+});
+
 // Handle the request
 $router->handleRequest();
 ?>

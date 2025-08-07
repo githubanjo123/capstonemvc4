@@ -3,16 +3,20 @@
 namespace App\Controllers\Admin;
 
 use App\Services\Auth\AuthService;
+use App\Services\User\UserService;
+use App\DAO\Auth\UserDAO;
 use App\Core\View;
 
 class AdminController
 {
     private $authService;
+    private $userService;
     private $view;
 
     public function __construct()
     {
         $this->authService = new AuthService();
+        $this->userService = new UserService(new UserDAO());
         $this->view = new View();
         
         // Ensure user is authenticated and is admin
@@ -211,5 +215,86 @@ class AdminController
         }
         
         return $yearSections;
+    }
+
+    /**
+     * Handle add user request
+     */
+    public function addUser()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->showError('Invalid request method.');
+            return;
+        }
+
+        $result = $this->userService->createUser($_POST);
+        
+        if ($result['success']) {
+            $this->showSuccess($result['message']);
+        } else {
+            $this->showError($result['message']);
+        }
+    }
+
+    /**
+     * Handle edit user request
+     */
+    public function editUser($userId)
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->showError('Invalid request method.');
+            return;
+        }
+
+        $result = $this->userService->updateUser($userId, $_POST);
+        
+        if ($result['success']) {
+            $this->showSuccess($result['message']);
+        } else {
+            $this->showError($result['message']);
+        }
+    }
+
+    /**
+     * Handle delete user request
+     */
+    public function deleteUser($userId)
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->showError('Invalid request method.');
+            return;
+        }
+
+        $result = $this->userService->deleteUser($userId);
+        
+        if ($result['success']) {
+            $this->showSuccess($result['message']);
+        } else {
+            $this->showError($result['message']);
+        }
+    }
+
+    /**
+     * Show success message
+     */
+    private function showSuccess($message)
+    {
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'success',
+            'message' => $message
+        ]);
+    }
+
+    /**
+     * Show error message
+     */
+    private function showError($message)
+    {
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'error',
+            'message' => $message
+        ]);
     }
 }

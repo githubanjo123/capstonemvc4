@@ -2,15 +2,16 @@
 
 namespace App\Services\User;
 
-use App\DAO\Auth\UserDAO;
+use App\Interfaces\UserServiceInterface;
+use App\Interfaces\UserDAOInterface;
 
-class UserService
+class UserService implements UserServiceInterface
 {
     private $userDAO;
 
-    public function __construct()
+    public function __construct(UserDAOInterface $userDAO)
     {
-        $this->userDAO = new UserDAO();
+        $this->userDAO = $userDAO;
     }
 
     /**

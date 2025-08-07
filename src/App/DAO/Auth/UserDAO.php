@@ -3,10 +3,11 @@
 namespace App\DAO\Auth;
 
 use App\Config\Database;
+use App\Interfaces\UserDAOInterface;
 use PDO;
 use PDOException;
 
-class UserDAO
+class UserDAO implements UserDAOInterface
 {
     private $db;
     private $table = 'users';
