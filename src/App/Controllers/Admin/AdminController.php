@@ -47,7 +47,13 @@ class AdminController
     public function logout()
     {
         $this->authService->logout();
-        header('Location: /login');
+        
+        // Get the base path for correct redirect
+        $scriptName = $_SERVER['SCRIPT_NAME'];
+        $basePath = dirname($scriptName);
+        $loginUrl = $basePath . '/login';
+        
+        header('Location: ' . $loginUrl);
         exit;
     }
 

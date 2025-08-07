@@ -253,7 +253,7 @@
                     </p>
                 </div>
                 <div class="col-md-4 text-end">
-                    <a href="/admin/logout" class="btn logout-btn">
+                    <a href="javascript:void(0)" onclick="logout()" class="btn logout-btn">
                         <i class="fas fa-sign-out-alt me-2"></i>
                         Logout
                     </a>
@@ -330,6 +330,19 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Get the current path and construct the logout URL
+                const currentPath = window.location.pathname;
+                const basePath = currentPath.replace('/admin/dashboard', '');
+                const logoutUrl = basePath + '/admin/logout';
+                
+                console.log('Logging out to:', logoutUrl);
+                window.location.href = logoutUrl;
+            }
+        }
+
         // Year-Section Tab Switching
         document.addEventListener('DOMContentLoaded', function() {
             const yearSectionTabs = document.querySelectorAll('.year-section-tab');
