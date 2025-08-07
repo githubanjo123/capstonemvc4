@@ -47,6 +47,21 @@ class Router
             $path = '/';
         }
 
+        // Remove subdirectory from path if it exists
+        $scriptName = $_SERVER['SCRIPT_NAME'];
+        $subdirectory = dirname($scriptName);
+        if ($subdirectory !== '/' && strpos($path, $subdirectory) === 0) {
+            $path = substr($path, strlen($subdirectory));
+            if (empty($path)) {
+                $path = '/';
+            }
+        }
+
+        // Debug: Log the processed path
+        error_log("Original path: " . parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+        error_log("Processed path: " . $path);
+        error_log("Available routes: " . json_encode(array_keys($this->routes[$method] ?? [])));
+
         // Check if route exists
         if (isset($this->routes[$method][$path])) {
             $callback = $this->routes[$method][$path];
