@@ -5,21 +5,13 @@ session_start();
 require_once '../vendor/autoload.php';
 
 use App\Core\Router;
-use App\Core\Container;
-use App\Interfaces\AuthServiceInterface;
 use App\Controllers\Auth\AuthController;
 
 // Initialize router
 $router = new Router();
 
-// Get container instance
-$container = Container::getInstance();
-
-// Get auth service from container
-$authService = $container->get(AuthServiceInterface::class);
-
-// Create auth controller with dependency injection
-$authController = new AuthController($authService);
+// Create auth controller
+$authController = new AuthController();
 
 // Root route - redirect to login
 $router->get('/', function() {

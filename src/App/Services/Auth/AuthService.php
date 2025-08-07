@@ -1,23 +1,22 @@
 <?php
 
-namespace App\Services\Impl;
+namespace App\Services\Auth;
 
-use App\Interfaces\AuthServiceInterface;
-use App\Interfaces\UserDAOInterface;
+use App\DAO\Auth\UserDAO;
 
-class AuthServiceImpl implements AuthServiceInterface
+class AuthService
 {
     private $userDAO;
 
-    public function __construct(UserDAOInterface $userDAO)
+    public function __construct()
     {
-        $this->userDAO = $userDAO;
+        $this->userDAO = new UserDAO();
     }
 
     /**
      * Login user with school ID and password
      */
-    public function login(string $school_id, string $password): array
+    public function login($school_id, $password)
     {
         // Validate inputs
         if (empty($school_id) || empty($password)) {
@@ -71,7 +70,7 @@ class AuthServiceImpl implements AuthServiceInterface
     /**
      * Logout current user
      */
-    public function logout(): array
+    public function logout()
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
@@ -89,7 +88,7 @@ class AuthServiceImpl implements AuthServiceInterface
     /**
      * Check if user is authenticated
      */
-    public function isAuthenticated(): bool
+    public function isAuthenticated()
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
@@ -101,7 +100,7 @@ class AuthServiceImpl implements AuthServiceInterface
     /**
      * Get current user data
      */
-    public function getCurrentUser(): ?array
+    public function getCurrentUser()
     {
         if (!$this->isAuthenticated()) {
             return null;
@@ -120,7 +119,7 @@ class AuthServiceImpl implements AuthServiceInterface
     /**
      * Require authentication
      */
-    public function requireAuth(): array
+    public function requireAuth()
     {
         if (!$this->isAuthenticated()) {
             return [
@@ -139,7 +138,7 @@ class AuthServiceImpl implements AuthServiceInterface
     /**
      * Require specific role
      */
-    public function requireRole(string $requiredRole): array
+    public function requireRole($requiredRole)
     {
         $authResult = $this->requireAuth();
         if (!$authResult['success']) {

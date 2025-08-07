@@ -2,16 +2,33 @@
 
 namespace App\Controllers\Auth;
 
-use App\Interfaces\AuthServiceInterface;
+use App\Services\Auth\AuthService;
 use App\Core\View;
 
 class AuthController
 {
     private $authService;
+    private $view;
 
-    public function __construct(AuthServiceInterface $authService)
+    public function __construct()
     {
-        $this->authService = $authService;
+        $this->authService = new AuthService();
+        $this->view = new View();
+    }
+
+    /**
+     * Show login page
+     */
+    public function showLogin()
+    {
+        // If user is already logged in, redirect to appropriate dashboard
+        if ($this->authService->isAuthenticated()) {
+            $user = $this->authService->getCurrentUser();
+            $this->redirectToDashboard($user['role']);
+            return;
+        }
+
+        $this->view->display('auth.login');
     }
 
     /**
@@ -86,11 +103,23 @@ class AuthController
     }
 
     /**
-     * Show login page
+     * Redirect to appropriate dashboard based on role
      */
-    public function showLogin()
+    private function redirectToDashboard($role)
     {
-        $view = new View();
-        $view->display('auth.login');
+        switch ($role) {
+            case 'admin':
+                header('Location: /admin/dashboard');
+                break;
+            case 'faculty':
+                header('Location: /faculty/dashboard');
+                break;
+            case 'student':
+                header('Location: /student/dashboard');
+                break;
+            default:
+                header('Location: /login');
+        }
+        exit;
     }
 }
