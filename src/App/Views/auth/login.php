@@ -110,7 +110,12 @@
             
             const formData = new FormData(this);
             
-            fetch('/api/auth/login', {
+            // Get the current path and construct the API URL
+            const currentPath = window.location.pathname;
+            const basePath = currentPath.replace('/login', '');
+            const apiUrl = basePath + '/api/auth/login';
+            
+            fetch(apiUrl, {
                 method: 'POST',
                 body: formData
             })
@@ -130,16 +135,16 @@
                     setTimeout(() => {
                         switch(data.role) {
                             case 'admin':
-                                window.location.href = '/admin/dashboard';
+                                window.location.href = basePath + '/admin/dashboard';
                                 break;
                             case 'faculty':
-                                window.location.href = '/faculty/dashboard';
+                                window.location.href = basePath + '/faculty/dashboard';
                                 break;
                             case 'student':
-                                window.location.href = '/student/dashboard';
+                                window.location.href = basePath + '/student/dashboard';
                                 break;
                             default:
-                                window.location.href = '/';
+                                window.location.href = basePath + '/';
                         }
                     }, 1000);
                 } else {
