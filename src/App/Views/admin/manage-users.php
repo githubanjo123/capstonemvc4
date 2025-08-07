@@ -9,11 +9,11 @@
             <p class="text-muted mb-0">Add students and faculty to the system</p>
         </div>
         <div class="col-md-6 text-end">
-            <button class="btn btn-add-student me-2">
+            <button class="btn btn-add-student me-2" data-bs-toggle="modal" data-bs-target="#addStudentModal">
                 <i class="fas fa-plus me-2"></i>
                 Add Student
             </button>
-            <button class="btn btn-add-faculty">
+            <button class="btn btn-add-faculty" data-bs-toggle="modal" data-bs-target="#addFacultyModal">
                 <i class="fas fa-plus me-2"></i>
                 Add Faculty
             </button>
@@ -196,5 +196,118 @@ function deleteFaculty(facultyId) {
         // TODO: Implement delete functionality
         alert('Delete faculty functionality coming soon!');
     }
-}
+
+    // Add Student Modal
+    function showAddStudentModal() {
+        $('#addStudentModal').modal('show');
+    }
+
+    // Handle Add Student Form
+    document.getElementById('addStudentForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const basePath = window.location.pathname.replace('/admin/dashboard', '');
+        
+        fetch(basePath + '/admin/users/add-student', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Show success message
+                alert(data.message);
+                // Close modal
+                $('#addStudentModal').modal('hide');
+                // Refresh page to show new student
+                location.reload();
+            } else {
+                // Show error message
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        });
+    });
 </script>
+
+<!-- Add Student Modal -->
+<div class="modal fade" id="addStudentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-user-plus me-2"></i>
+                    Add New Student
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addStudentForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="school_id" class="form-label">School ID *</label>
+                                <input type="text" class="form-control" id="school_id" name="school_id" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="full_name" class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="full_name" name="full_name" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="year_level" class="form-label">Year Level *</label>
+                                <select class="form-control" id="year_level" name="year_level" required>
+                                    <option value="">Select Year Level</option>
+                                    <option value="1st">1st Year</option>
+                                    <option value="2nd">2nd Year</option>
+                                    <option value="3rd">3rd Year</option>
+                                    <option value="4th">4th Year</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="section" class="form-label">Section *</label>
+                                <select class="form-control" id="section" name="section" required>
+                                    <option value="">Select Section</option>
+                                    <option value="A">Section A</option>
+                                    <option value="B">Section B</option>
+                                    <option value="C">Section C</option>
+                                    <option value="D">Section D</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Leave blank for default password">
+                        <small class="text-muted">Default password will be: School ID + Full Name</small>
+                    </div>
+
+                    <input type="hidden" name="role" value="student">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>
+                    Cancel
+                </button>
+                <button type="submit" form="addStudentForm" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>
+                    Add Student
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

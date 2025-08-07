@@ -75,6 +75,10 @@ $router->post('/admin/users/add', function() use ($adminController) {
     $adminController->addUser();
 });
 
+$router->post('/admin/users/add-student', function() use ($adminController) {
+    $adminController->addStudent();
+});
+
 $router->post('/admin/users/edit/{id}', function($id) use ($adminController) {
     $adminController->editUser($id);
 });

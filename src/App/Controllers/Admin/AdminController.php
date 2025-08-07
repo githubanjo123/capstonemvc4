@@ -162,6 +162,25 @@ class AdminController
     }
 
     /**
+     * Handle add student request
+     */
+    public function addStudent()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->showError('Invalid request method.');
+            return;
+        }
+
+        $result = $this->userService->createUser($_POST);
+        
+        if ($result['success']) {
+            $this->showSuccess($result['message']);
+        } else {
+            $this->showError($result['message']);
+        }
+    }
+
+    /**
      * Handle edit user request
      */
     public function editUser($userId)
