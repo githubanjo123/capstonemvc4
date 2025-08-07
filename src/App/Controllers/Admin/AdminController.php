@@ -174,10 +174,27 @@ class AdminController
         $result = $this->userService->createUser($_POST);
         
         if ($result['success']) {
-            $this->showSuccess($result['message']);
+            // Store success message in session
+            $_SESSION['success_message'] = $result['message'];
+            // Redirect back to dashboard
+            $this->redirectToDashboard();
         } else {
-            $this->showError($result['message']);
+            // Store error message in session
+            $_SESSION['error_message'] = $result['message'];
+            // Redirect back to dashboard
+            $this->redirectToDashboard();
         }
+    }
+
+    /**
+     * Redirect to admin dashboard
+     */
+    private function redirectToDashboard()
+    {
+        $scriptName = $_SERVER['SCRIPT_NAME'];
+        $basePath = dirname($scriptName);
+        header('Location: ' . $basePath . '/admin/dashboard');
+        exit;
     }
 
     /**

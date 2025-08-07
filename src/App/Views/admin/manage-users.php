@@ -202,35 +202,10 @@ function deleteFaculty(facultyId) {
         $('#addStudentModal').modal('show');
     }
 
-    // Handle Add Student Form
+    // Handle Add Student Form - Proper MVC approach
     document.getElementById('addStudentForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = new FormData(this);
-        const basePath = window.location.pathname.replace('/admin/dashboard', '');
-        
-        fetch(basePath + '/admin/users/add-student', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                // Show success message
-                alert(data.message);
-                // Close modal
-                $('#addStudentModal').modal('hide');
-                // Refresh page to show new student
-                location.reload();
-            } else {
-                // Show error message
-                alert(data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred. Please try again.');
-        });
+        // Let the form submit normally - Controller will handle everything
+        // No JavaScript needed for form submission
     });
 </script>
 
@@ -246,7 +221,7 @@ function deleteFaculty(facultyId) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="addStudentForm">
+                <form id="addStudentForm" action="<?= dirname($_SERVER['SCRIPT_NAME']) ?>/admin/users/add-student" method="POST">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
