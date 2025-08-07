@@ -112,8 +112,14 @@
             
             // Get the current path and construct the API URL
             const currentPath = window.location.pathname;
+            // Remove '/login' from the path to get the base
             const basePath = currentPath.replace('/login', '');
             const apiUrl = basePath + '/api/auth/login';
+            
+            // Debug: Log the paths
+            console.log('Current path:', currentPath);
+            console.log('Base path:', basePath);
+            console.log('API URL:', apiUrl);
             
             fetch(apiUrl, {
                 method: 'POST',
@@ -135,13 +141,13 @@
                     setTimeout(() => {
                         switch(data.role) {
                             case 'admin':
-                                window.location.href = basePath + '/admin/dashboard';
+                                window.location.href = basePath + '/admin-success';
                                 break;
                             case 'faculty':
-                                window.location.href = basePath + '/faculty/dashboard';
+                                window.location.href = basePath + '/faculty-success';
                                 break;
                             case 'student':
-                                window.location.href = basePath + '/student/dashboard';
+                                window.location.href = basePath + '/student-success';
                                 break;
                             default:
                                 window.location.href = basePath + '/';

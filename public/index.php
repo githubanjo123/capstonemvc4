@@ -37,6 +37,25 @@ $router->post('/api/auth/logout', function() use ($authController) {
     $authController->logout();
 });
 
+// Success pages for each role
+$router->get('/admin-success', function() {
+    echo '<h1>Admin Login Successful!</h1>';
+    echo '<p>Welcome Admin! You have successfully logged in.</p>';
+    echo '<p><a href="/login">Back to Login</a></p>';
+});
+
+$router->get('/faculty-success', function() {
+    echo '<h1>Faculty Login Successful!</h1>';
+    echo '<p>Welcome Faculty! You have successfully logged in.</p>';
+    echo '<p><a href="/login">Back to Login</a></p>';
+});
+
+$router->get('/student-success', function() {
+    echo '<h1>Student Login Successful!</h1>';
+    echo '<p>Welcome Student! You have successfully logged in.</p>';
+    echo '<p><a href="/login">Back to Login</a></p>';
+});
+
 // Handle the request
 $router->handleRequest();
 ?>
