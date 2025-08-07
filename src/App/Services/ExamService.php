@@ -2,24 +2,24 @@
 
 namespace App\Services;
 
-use App\Models\Exam;
-use App\Models\Question;
-use App\Models\ExamAttempt;
-use App\Models\StudentAnswer;
+use App\DAO\ExamDAO;
+use App\DAO\QuestionDAO;
+use App\DAO\ExamAttemptDAO;
+use App\DAO\StudentAnswerDAO;
 
 class ExamService
 {
-    private $examModel;
-    private $questionModel;
-    private $attemptModel;
-    private $answerModel;
+    private $examDAO;
+    private $questionDAO;
+    private $attemptDAO;
+    private $answerDAO;
 
     public function __construct()
     {
-        $this->examModel = new Exam();
-        $this->questionModel = new Question();
-        $this->attemptModel = new ExamAttempt();
-        $this->answerModel = new StudentAnswer();
+        $this->examDAO = new ExamDAO();
+        $this->questionDAO = new QuestionDAO();
+        $this->attemptDAO = new ExamAttemptDAO();
+        $this->answerDAO = new StudentAnswerDAO();
     }
 
     /**
@@ -29,7 +29,7 @@ class ExamService
     {
         try {
             // Create exam
-            $exam_id = $this->examModel->create($examData);
+            $exam_id = $this->examDAO->create($examData);
             if (!$exam_id) {
                 return [
                     'success' => false,
@@ -42,7 +42,7 @@ class ExamService
                 $question['exam_id'] = $exam_id;
                 $question['question_order'] = $index + 1;
                 
-                if (!$this->questionModel->create($question)) {
+                if (!$this->questionDAO->create($question)) {
                     return [
                         'success' => false,
                         'message' => 'Failed to add question ' . ($index + 1)
@@ -69,7 +69,7 @@ class ExamService
     public function startExam($exam_id, $student_id)
     {
         // Check if student can take exam
-        if (!$this->attemptModel->canTakeExam($exam_id, $student_id)) {
+        if (!$this->attemptDAO->canTakeExam($exam_id, $student_id)) {
             return [
                 'success' => false,
                 'message' => 'You have already completed this exam.'
@@ -77,7 +77,7 @@ class ExamService
         }
 
         // Start attempt
-        $attempt_id = $this->attemptModel->startAttempt($exam_id, $student_id);
+        $attempt_id = $this->attemptDAO->startAttempt($exam_id, $student_id);
         if (!$attempt_id) {
             return [
                 'success' => false,
@@ -100,11 +100,11 @@ class ExamService
         try {
             // Save all answers
             foreach ($answers as $question_id => $answer) {
-                $this->answerModel->saveAnswer($attempt_id, $question_id, $answer);
+                $this->answerDAO->saveAnswer($attempt_id, $question_id, $answer);
             }
 
             // Submit attempt
-            if (!$this->attemptModel->submitAttempt($attempt_id)) {
+            if (!$this->attemptDAO->submitAttempt($attempt_id)) {
                 return [
                     'success' => false,
                     'message' => 'Failed to submit exam.'
@@ -133,12 +133,12 @@ class ExamService
      */
     public function gradeExam($attempt_id)
     {
-        $answers = $this->answerModel->getAnswersByAttempt($attempt_id);
+        $answers = $this->answerDAO->getAnswersByAttempt($attempt_id);
         $total_score = 0;
         $total_points = 0;
 
         foreach ($answers as $answer) {
-            $question = $this->questionModel->getQuestionById($answer['question_id']);
+            $question = $this->questionDAO->getQuestionById($answer['question_id']);
             if (!$question) continue;
 
             $total_points += $question['points'];
@@ -163,12 +163,12 @@ class ExamService
             }
 
             // Update answer with grading
-            $this->answerModel->gradeAnswer($attempt_id, $answer['question_id'], $is_correct, $points_earned);
+            $this->answerDAO->gradeAnswer($attempt_id, $answer['question_id'], $is_correct, $points_earned);
             $total_score += $points_earned;
         }
 
         // Update attempt with final score
-        $this->attemptModel->gradeAttempt($attempt_id, $total_score, $total_points);
+        $this->attemptDAO->gradeAttempt($attempt_id, $total_score, $total_points);
 
         return [
             'score' => $total_score,
@@ -228,8 +228,8 @@ class ExamService
      */
     public function getExamResults($exam_id)
     {
-        $attempts = $this->attemptModel->getAttemptsByExam($exam_id);
-        $statistics = $this->attemptModel->getExamStatistics($exam_id);
+        $attempts = $this->attemptDAO->getAttemptsByExam($exam_id);
+        $statistics = $this->attemptDAO->getExamStatistics($exam_id);
 
         return [
             'attempts' => $attempts,
@@ -242,7 +242,7 @@ class ExamService
      */
     public function getStudentResults($student_id)
     {
-        return $this->attemptModel->getAttemptsByStudent($student_id);
+        return $this->attemptDAO->getAttemptsByStudent($student_id);
     }
 
     /**
@@ -250,12 +250,12 @@ class ExamService
      */
     public function getExamForStudent($exam_id)
     {
-        $exam = $this->examModel->getExamById($exam_id);
+        $exam = $this->examDAO->getExamById($exam_id);
         if (!$exam) {
             return null;
         }
 
-        $questions = $this->questionModel->getQuestionsByExam($exam_id);
+        $questions = $this->questionDAO->getQuestionsByExam($exam_id);
         $exam['questions'] = $questions;
 
         return $exam;

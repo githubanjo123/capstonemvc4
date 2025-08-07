@@ -1,23 +1,23 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\Student;
 
 use App\Services\AuthService;
 use App\Services\ExamService;
-use App\Models\Exam;
+use App\DAO\ExamDAO;
 use App\Core\View;
 
 class StudentController
 {
     private $authService;
     private $examService;
-    private $examModel;
+    private $examDAO;
 
     public function __construct()
     {
         $this->authService = new AuthService();
         $this->examService = new ExamService();
-        $this->examModel = new Exam();
+        $this->examDAO = new ExamDAO();
     }
 
     /**
@@ -32,7 +32,7 @@ class StudentController
         }
 
         $user = $this->authService->getCurrentUser();
-        $exams = $this->examModel->getExamsForStudents($user['year_level'], $user['section']);
+        $exams = $this->examDAO->getExamsForStudents($user['year_level'], $user['section']);
 
         $view = new View();
         $view->display('student.dashboard', [

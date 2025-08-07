@@ -2,15 +2,15 @@
 
 namespace App\Services;
 
-use App\Models\User;
+use App\DAO\UserDAO;
 
 class AuthService
 {
-    private $userModel;
+    private $userDAO;
 
     public function __construct()
     {
-        $this->userModel = new User();
+        $this->userDAO = new UserDAO();
     }
 
     /**
@@ -31,7 +31,7 @@ class AuthService
         $password = trim($password);
 
         // Authenticate user
-        $user = $this->userModel->authenticate($school_id, $password);
+        $user = $this->userDAO->authenticate($school_id, $password);
 
         if (!$user) {
             return [

@@ -1,29 +1,29 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\Faculty;
 
 use App\Services\AuthService;
 use App\Services\ExamService;
-use App\Models\Exam;
-use App\Models\Question;
-use App\Models\Subject;
+use App\DAO\ExamDAO;
+use App\DAO\QuestionDAO;
+use App\DAO\SubjectDAO;
 use App\Core\View;
 
 class FacultyController
 {
     private $authService;
     private $examService;
-    private $examModel;
-    private $questionModel;
-    private $subjectModel;
+    private $examDAO;
+    private $questionDAO;
+    private $subjectDAO;
 
     public function __construct()
     {
         $this->authService = new AuthService();
         $this->examService = new ExamService();
-        $this->examModel = new Exam();
-        $this->questionModel = new Question();
-        $this->subjectModel = new Subject();
+        $this->examDAO = new ExamDAO();
+        $this->questionDAO = new QuestionDAO();
+        $this->subjectDAO = new SubjectDAO();
     }
 
     /**
@@ -38,8 +38,8 @@ class FacultyController
         }
 
         $user = $this->authService->getCurrentUser();
-        $exams = $this->examModel->getExamsByFaculty($user['user_id']);
-        $subjects = $this->subjectModel->getSubjectsByFaculty($user['user_id']);
+        $exams = $this->examDAO->getExamsByFaculty($user['user_id']);
+        $subjects = $this->subjectDAO->getSubjectsByFaculty($user['user_id']);
 
         $view = new View();
         $view->display('faculty.dashboard', [
@@ -99,7 +99,7 @@ class FacultyController
             }
         } else {
             $user = $this->authService->getCurrentUser();
-            $subjects = $this->subjectModel->getSubjectsByFaculty($user['user_id']);
+            $subjects = $this->subjectDAO->getSubjectsByFaculty($user['user_id']);
             
             $view = new View();
             $view->display('faculty.create_exam', [
@@ -120,7 +120,7 @@ class FacultyController
         }
 
         $user = $this->authService->getCurrentUser();
-        $exams = $this->examModel->getExamsByFaculty($user['user_id']);
+        $exams = $this->examDAO->getExamsByFaculty($user['user_id']);
 
         $view = new View();
         $view->display('faculty.exams', [
@@ -140,7 +140,7 @@ class FacultyController
         }
 
         $user = $this->authService->getCurrentUser();
-        $exam = $this->examModel->getExamById($exam_id);
+        $exam = $this->examDAO->getExamById($exam_id);
         
         // Check if faculty owns this exam
         if (!$exam || $exam['created_by'] != $user['user_id']) {
@@ -159,15 +159,15 @@ class FacultyController
                 'status' => $_POST['status'] ?? 'active'
             ];
 
-            $result = $this->examModel->update($exam_id, $examData);
+            $result = $this->examDAO->update($exam_id, $examData);
             if ($result) {
                 $this->redirect('/faculty/exams?success=Exam updated successfully');
             } else {
                 $this->redirect('/faculty/exams?error=Failed to update exam');
             }
         } else {
-            $questions = $this->questionModel->getQuestionsByExam($exam_id);
-            $subjects = $this->subjectModel->getSubjectsByFaculty($user['user_id']);
+            $questions = $this->questionDAO->getQuestionsByExam($exam_id);
+            $subjects = $this->subjectDAO->getSubjectsByFaculty($user['user_id']);
 
             $view = new View();
             $view->display('faculty.edit_exam', [
@@ -190,7 +190,7 @@ class FacultyController
         }
 
         $user = $this->authService->getCurrentUser();
-        $exam = $this->examModel->getExamById($exam_id);
+        $exam = $this->examDAO->getExamById($exam_id);
         
         // Check if faculty owns this exam
         if (!$exam || $exam['created_by'] != $user['user_id']) {
@@ -198,7 +198,7 @@ class FacultyController
             return;
         }
 
-        $result = $this->examModel->delete($exam_id);
+        $result = $this->examDAO->delete($exam_id);
         if ($result) {
             $this->redirect('/faculty/exams?success=Exam deleted successfully');
         } else {
@@ -218,7 +218,7 @@ class FacultyController
         }
 
         $user = $this->authService->getCurrentUser();
-        $exam = $this->examModel->getExamById($exam_id);
+        $exam = $this->examDAO->getExamById($exam_id);
         
         // Check if faculty owns this exam
         if (!$exam || $exam['created_by'] != $user['user_id']) {
@@ -239,7 +239,7 @@ class FacultyController
                 'points' => $_POST['points'] ?? 1
             ];
 
-            $result = $this->questionModel->create($questionData);
+            $result = $this->questionDAO->create($questionData);
             if ($result) {
                 $this->redirect("/faculty/exams/$exam_id/edit?success=Question added successfully");
             } else {
@@ -264,14 +264,14 @@ class FacultyController
             return;
         }
 
-        $question = $this->questionModel->getQuestionById($question_id);
+        $question = $this->questionDAO->getQuestionById($question_id);
         if (!$question) {
             $this->redirect('/faculty/exams?error=Question not found');
             return;
         }
 
         $user = $this->authService->getCurrentUser();
-        $exam = $this->examModel->getExamById($question['exam_id']);
+        $exam = $this->examDAO->getExamById($question['exam_id']);
         
         // Check if faculty owns this exam
         if (!$exam || $exam['created_by'] != $user['user_id']) {
@@ -291,7 +291,7 @@ class FacultyController
                 'points' => $_POST['points'] ?? 1
             ];
 
-            $result = $this->questionModel->update($question_id, $questionData);
+            $result = $this->questionDAO->update($question_id, $questionData);
             if ($result) {
                 $this->redirect("/faculty/exams/{$question['exam_id']}/edit?success=Question updated successfully");
             } else {
@@ -317,14 +317,14 @@ class FacultyController
             return;
         }
 
-        $question = $this->questionModel->getQuestionById($question_id);
+        $question = $this->questionDAO->getQuestionById($question_id);
         if (!$question) {
             $this->redirect('/faculty/exams?error=Question not found');
             return;
         }
 
         $user = $this->authService->getCurrentUser();
-        $exam = $this->examModel->getExamById($question['exam_id']);
+        $exam = $this->examDAO->getExamById($question['exam_id']);
         
         // Check if faculty owns this exam
         if (!$exam || $exam['created_by'] != $user['user_id']) {
@@ -332,7 +332,7 @@ class FacultyController
             return;
         }
 
-        $result = $this->questionModel->delete($question_id);
+        $result = $this->questionDAO->delete($question_id);
         if ($result) {
             $this->redirect("/faculty/exams/{$question['exam_id']}/edit?success=Question deleted successfully");
         } else {
@@ -352,7 +352,7 @@ class FacultyController
         }
 
         $user = $this->authService->getCurrentUser();
-        $exam = $this->examModel->getExamById($exam_id);
+        $exam = $this->examDAO->getExamById($exam_id);
         
         // Check if faculty owns this exam
         if (!$exam || $exam['created_by'] != $user['user_id']) {

@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace App\DAO;
 
 use App\Config\Database;
 use PDO;
 use PDOException;
 
-class ExamAttempt
+class ExamAttemptDAO
 {
     private $db;
     private $table = 'exam_attempts';

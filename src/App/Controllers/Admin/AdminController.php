@@ -1,26 +1,26 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\Admin;
 
 use App\Services\AuthService;
-use App\Models\User;
-use App\Models\Subject;
-use App\Models\Exam;
+use App\DAO\UserDAO;
+use App\DAO\SubjectDAO;
+use App\DAO\ExamDAO;
 use App\Core\View;
 
 class AdminController
 {
     private $authService;
-    private $userModel;
-    private $subjectModel;
-    private $examModel;
+    private $userDAO;
+    private $subjectDAO;
+    private $examDAO;
 
     public function __construct()
     {
         $this->authService = new AuthService();
-        $this->userModel = new User();
-        $this->subjectModel = new Subject();
-        $this->examModel = new Exam();
+        $this->userDAO = new UserDAO();
+        $this->subjectDAO = new SubjectDAO();
+        $this->examDAO = new ExamDAO();
     }
 
     /**
@@ -35,9 +35,9 @@ class AdminController
         }
 
         $user = $this->authService->getCurrentUser();
-        $totalUsers = count($this->userModel->getAllUsers());
-        $totalSubjects = count($this->subjectModel->getAllSubjects());
-        $totalExams = count($this->examModel->getAllExams());
+        $totalUsers = count($this->userDAO->getAllUsers());
+        $totalSubjects = count($this->subjectDAO->getAllSubjects());
+        $totalExams = count($this->examDAO->getAllExams());
 
         $view = new View();
         $view->display('admin.dashboard', [
@@ -61,7 +61,7 @@ class AdminController
             return;
         }
 
-        $users = $this->userModel->getAllUsers();
+        $users = $this->userDAO->getAllUsers();
         $view = new View();
         $view->display('admin.users', [
             'users' => $users
@@ -88,7 +88,7 @@ class AdminController
                 'section' => $_POST['section'] ?? null
             ];
 
-            $result = $this->userModel->create($data);
+            $result = $this->userDAO->create($data);
             if ($result) {
                 $this->redirect('/admin/users?success=User added successfully');
             } else {
@@ -120,14 +120,14 @@ class AdminController
                 'section' => $_POST['section'] ?? null
             ];
 
-            $result = $this->userModel->update($user_id, $data);
+            $result = $this->userDAO->update($user_id, $data);
             if ($result) {
                 $this->redirect('/admin/users?success=User updated successfully');
             } else {
                 $this->redirect('/admin/users?error=Failed to update user');
             }
         } else {
-            $user = $this->userModel->findById($user_id);
+            $user = $this->userDAO->findById($user_id);
             if (!$user) {
                 $this->redirect('/admin/users?error=User not found');
                 return;
@@ -151,7 +151,7 @@ class AdminController
             return;
         }
 
-        $result = $this->userModel->delete($user_id);
+        $result = $this->userDAO->delete($user_id);
         if ($result) {
             $this->redirect('/admin/users?success=User deleted successfully');
         } else {
@@ -170,7 +170,7 @@ class AdminController
             return;
         }
 
-        $subjects = $this->subjectModel->getAllSubjects();
+        $subjects = $this->subjectDAO->getAllSubjects();
         $view = new View();
         $view->display('admin.subjects', [
             'subjects' => $subjects
@@ -194,7 +194,7 @@ class AdminController
                 'descriptive_title' => $_POST['descriptive_title'] ?? ''
             ];
 
-            $result = $this->subjectModel->create($data);
+            $result = $this->subjectDAO->create($data);
             if ($result) {
                 $this->redirect('/admin/subjects?success=Subject added successfully');
             } else {
@@ -223,14 +223,14 @@ class AdminController
                 'descriptive_title' => $_POST['descriptive_title'] ?? ''
             ];
 
-            $result = $this->subjectModel->update($subject_id, $data);
+            $result = $this->subjectDAO->update($subject_id, $data);
             if ($result) {
                 $this->redirect('/admin/subjects?success=Subject updated successfully');
             } else {
                 $this->redirect('/admin/subjects?error=Failed to update subject');
             }
         } else {
-            $subject = $this->subjectModel->getSubjectById($subject_id);
+            $subject = $this->subjectDAO->getSubjectById($subject_id);
             if (!$subject) {
                 $this->redirect('/admin/subjects?error=Subject not found');
                 return;
@@ -254,7 +254,7 @@ class AdminController
             return;
         }
 
-        $result = $this->subjectModel->delete($subject_id);
+        $result = $this->subjectDAO->delete($subject_id);
         if ($result) {
             $this->redirect('/admin/subjects?success=Subject deleted successfully');
         } else {
@@ -273,7 +273,7 @@ class AdminController
             return;
         }
 
-        $exams = $this->examModel->getAllExams();
+        $exams = $this->examDAO->getAllExams();
         $view = new View();
         $view->display('admin.results', [
             'exams' => $exams

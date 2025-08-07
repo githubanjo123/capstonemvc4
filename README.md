@@ -1,6 +1,6 @@
 # Examination System with AI Essay Checker
 
-A comprehensive web-based examination system built with PHP using MVC architecture. The system supports three user roles (Admin, Faculty, Student) and includes automated scoring with AI essay checking capabilities.
+A comprehensive web-based examination system built with PHP using DAO architecture. The system supports three user roles (Admin, Faculty, Student) and includes automated scoring with AI essay checking capabilities.
 
 ## 🚀 Features
 
@@ -25,7 +25,7 @@ A comprehensive web-based examination system built with PHP using MVC architectu
 
 ## 🛠 Technical Features
 
-- **MVC Architecture**: Clean separation of concerns
+- **DAO Architecture**: Clean separation of concerns with organized layers
 - **Role-Based Access Control**: Secure access based on user roles
 - **Session Management**: Secure session handling
 - **Database Integration**: MySQL database with proper relationships
@@ -126,9 +126,13 @@ examination-system/
 ├── src/                   # Application source code
 │   └── App/
 │       ├── Config/        # Configuration files
-│       ├── Controllers/   # Controller classes
+│       ├── DAO/           # Data Access Objects
+│       ├── Controllers/   # Controllers organized by feature
+│       │   ├── Auth/      # Authentication controllers
+│       │   ├── Admin/     # Admin controllers
+│       │   ├── Faculty/   # Faculty controllers
+│       │   └── Student/   # Student controllers
 │       ├── Core/          # Core framework classes
-│       ├── Models/        # Data models
 │       ├── Services/      # Business logic services
 │       └── Views/         # View templates
 ├── vendor/                # Composer dependencies
@@ -137,25 +141,25 @@ examination-system/
 └── composer.json          # Composer configuration
 ```
 
-### MVC Implementation
+### DAO Pattern Implementation
 
-#### Models (Data Access Layer)
-- `User.php` - User management
-- `Exam.php` - Exam management
-- `Question.php` - Question management
-- `Subject.php` - Subject management
-- `ExamAttempt.php` - Exam attempt tracking
-- `StudentAnswer.php` - Student answer management
+#### DAO Layer (Data Access Objects)
+- `UserDAO.php` - User database operations
+- `ExamDAO.php` - Exam database operations
+- `QuestionDAO.php` - Question database operations
+- `SubjectDAO.php` - Subject database operations
+- `ExamAttemptDAO.php` - Exam attempt database operations
+- `StudentAnswerDAO.php` - Student answer database operations
 
 #### Services (Business Logic Layer)
 - `AuthService.php` - Authentication and authorization
 - `ExamService.php` - Exam creation, grading, and AI essay checking
 
 #### Controllers (Request Handling)
-- `AuthController.php` - Login/logout handling
-- `AdminController.php` - Admin-specific actions
-- `FacultyController.php` - Faculty-specific actions
-- `StudentController.php` - Student-specific actions
+- `Auth/AuthController.php` - Login/logout handling
+- `Admin/AdminController.php` - Admin-specific actions
+- `Faculty/FacultyController.php` - Faculty-specific actions
+- `Student/StudentController.php` - Student-specific actions
 
 #### Views (Presentation Layer)
 - Layout templates with Bootstrap styling
