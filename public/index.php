@@ -13,6 +13,10 @@ $router = new Router();
 // Create auth controller
 $authController = new AuthController();
 
+// Debug information (remove this later)
+$currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+error_log("Requested path: " . $currentPath);
+
 // Root route - redirect to login
 $router->get('/', function() {
     header('Location: /login');
