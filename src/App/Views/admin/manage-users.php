@@ -1,20 +1,20 @@
 <!-- Top Section - Add User Actions -->
-<div class="action-buttons">
-    <div class="row align-items-center">
-        <div class="col-md-6">
-            <h4 class="mb-1">
-                <i class="fas fa-user-plus me-2"></i>
+<div class="mb-8">
+    <div class="flex justify-between items-center">
+        <div>
+            <h4 class="text-xl font-semibold text-grey-800 mb-1">
+                <i class="fas fa-user-plus mr-2 text-primary-600"></i>
                 Add New Users
             </h4>
-            <p class="text-muted mb-0">Add students and faculty to the system</p>
+            <p class="text-grey-600">Add students and faculty to the system</p>
         </div>
-        <div class="col-md-6 text-end">
-            <button class="btn btn-add-student me-2" data-bs-toggle="modal" data-bs-target="#addStudentModal">
-                <i class="fas fa-plus me-2"></i>
+        <div class="flex space-x-3">
+            <button class="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:-translate-y-1" onclick="showAddStudentModal()">
+                <i class="fas fa-plus mr-2"></i>
                 Add Student
             </button>
-            <button class="btn btn-add-faculty" data-bs-toggle="modal" data-bs-target="#addFacultyModal">
-                <i class="fas fa-plus me-2"></i>
+            <button class="bg-transparent border-2 border-grey-500 text-grey-600 hover:bg-grey-500 hover:text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300" onclick="showAddFacultyModal()">
+                <i class="fas fa-plus mr-2"></i>
                 Add Faculty
             </button>
         </div>
@@ -22,22 +22,22 @@
 </div>
 
 <!-- Students Section - Organized by Year & Section -->
-<div class="students-section">
-    <h5 class="mb-3">
-        <i class="fas fa-graduation-cap me-2"></i>
+<div class="mb-8">
+    <h5 class="text-lg font-semibold text-grey-800 mb-4">
+        <i class="fas fa-graduation-cap mr-2 text-primary-600"></i>
         Students by Year & Section
     </h5>
     
     <!-- Year-Section Tabs -->
-    <div class="year-section-tabs">
+    <div class="flex flex-wrap gap-2 mb-6">
         <?php 
         $firstSection = true;
         foreach ($yearSections as $yearSection => $count): 
         ?>
-            <button class="year-section-tab <?= $firstSection ? 'active' : '' ?>" 
+            <button class="year-section-tab <?= $firstSection ? 'active' : '' ?> bg-grey-100 border border-grey-300 text-grey-600 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 hover:bg-primary-600 hover:text-white hover:border-primary-600" 
                     data-section="section-<?= str_replace(' ', '-', strtolower($yearSection)) ?>">
                 <?= $yearSection ?>
-                <span class="student-count"><?= $count ?></span>
+                <span class="bg-green-500 text-white rounded-full w-5 h-5 inline-flex items-center justify-center text-xs font-bold ml-2"><?= $count ?></span>
             </button>
         <?php 
             $firstSection = false;
@@ -54,50 +54,49 @@
             return ($student['year_level'] . ' ' . $student['section']) === $yearSection;
         });
     ?>
-        <div class="student-section <?= $firstSection ? 'active' : '' ?>" 
-             id="<?= $sectionId ?>" 
-             style="<?= $firstSection ? 'display: block;' : 'display: none;' ?>">
+        <div class="student-section <?= $firstSection ? 'active' : '' ?> <?= !$firstSection ? 'hidden' : '' ?>" 
+             id="<?= $sectionId ?>">
             
             <!-- Section Header -->
-            <div class="section-header">
-                <div class="row align-items-center">
-                    <div class="col-md-6">
-                        <h6 class="section-title">
-                            <i class="fas fa-users me-2"></i>
+            <div class="bg-grey-100 p-4 rounded-lg mb-4 border-l-4 border-primary-600">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h6 class="text-lg font-bold text-primary-600">
+                            <i class="fas fa-users mr-2"></i>
                             <?= $yearSection ?>
                         </h6>
                     </div>
-                    <div class="col-md-6 text-end">
-                        <span class="section-count"><?= $count ?> students</span>
+                    <div>
+                        <span class="text-grey-600 text-sm"><?= $count ?> students</span>
                     </div>
                 </div>
             </div>
 
             <!-- Student Cards -->
             <?php foreach ($sectionStudents as $student): ?>
-                <div class="student-card">
-                    <div class="row align-items-center">
-                        <div class="col-md-8">
-                            <div class="student-name">
-                                <i class="fas fa-user-graduate me-2"></i>
+                <div class="bg-white border border-grey-200 rounded-lg p-6 mb-4 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                    <div class="flex justify-between items-center">
+                        <div class="flex-1">
+                            <div class="text-lg font-bold text-primary-600 mb-2">
+                                <i class="fas fa-user-graduate mr-2"></i>
                                 <?= htmlspecialchars($student['full_name']) ?>
                             </div>
-                            <div class="student-email">
-                                <i class="fas fa-id-card me-2"></i>
+                            <div class="text-grey-600 text-sm mb-2">
+                                <i class="fas fa-id-card mr-2"></i>
                                 <?= htmlspecialchars($student['school_id']) ?>
                             </div>
-                            <div class="student-date">
-                                <i class="fas fa-calendar me-2"></i>
+                            <div class="text-grey-500 text-xs">
+                                <i class="fas fa-calendar mr-2"></i>
                                 Added on <?= date('M d, Y', strtotime($student['created_at'])) ?>
                             </div>
                         </div>
-                        <div class="col-md-4 text-end">
-                            <button class="btn btn-edit me-2" onclick="editStudent(<?= $student['user_id'] ?>)">
-                                <i class="fas fa-edit me-1"></i>
+                        <div class="flex space-x-2">
+                            <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded text-sm transition-all duration-300" onclick="editStudent(<?= $student['user_id'] ?>)">
+                                <i class="fas fa-edit mr-1"></i>
                                 Edit
                             </button>
-                            <button class="btn btn-delete" onclick="deleteStudent(<?= $student['user_id'] ?>)">
-                                <i class="fas fa-trash me-1"></i>
+                            <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm transition-all duration-300" onclick="deleteStudent(<?= $student['user_id'] ?>)">
+                                <i class="fas fa-trash mr-1"></i>
                                 Delete
                             </button>
                         </div>
@@ -112,51 +111,51 @@
 </div>
 
 <!-- Faculty Section -->
-<div class="faculty-section mt-5">
-    <h5 class="mb-3">
-        <i class="fas fa-chalkboard-teacher me-2"></i>
+<div class="mt-12">
+    <h5 class="text-lg font-semibold text-grey-800 mb-4">
+        <i class="fas fa-chalkboard-teacher mr-2 text-primary-600"></i>
         Faculty Members
     </h5>
     
-    <div class="section-header">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <h6 class="section-title">
-                    <i class="fas fa-users me-2"></i>
+    <div class="bg-grey-100 p-4 rounded-lg mb-4 border-l-4 border-primary-600">
+        <div class="flex justify-between items-center">
+            <div>
+                <h6 class="text-lg font-bold text-primary-600">
+                    <i class="fas fa-users mr-2"></i>
                     All Faculty
                 </h6>
             </div>
-            <div class="col-md-6 text-end">
-                <span class="section-count"><?= count($faculty) ?> faculty members</span>
+            <div>
+                <span class="text-grey-600 text-sm"><?= count($faculty) ?> faculty members</span>
             </div>
         </div>
     </div>
 
     <!-- Faculty Cards -->
     <?php foreach ($faculty as $facultyMember): ?>
-        <div class="student-card">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <div class="student-name">
-                        <i class="fas fa-user-tie me-2"></i>
+        <div class="bg-white border border-grey-200 rounded-lg p-6 mb-4 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+            <div class="flex justify-between items-center">
+                <div class="flex-1">
+                    <div class="text-lg font-bold text-primary-600 mb-2">
+                        <i class="fas fa-user-tie mr-2"></i>
                         <?= htmlspecialchars($facultyMember['full_name']) ?>
                     </div>
-                    <div class="student-email">
-                        <i class="fas fa-id-card me-2"></i>
+                    <div class="text-grey-600 text-sm mb-2">
+                        <i class="fas fa-id-card mr-2"></i>
                         <?= htmlspecialchars($facultyMember['school_id']) ?>
                     </div>
-                    <div class="student-date">
-                        <i class="fas fa-calendar me-2"></i>
+                    <div class="text-grey-500 text-xs">
+                        <i class="fas fa-calendar mr-2"></i>
                         Added on <?= date('M d, Y', strtotime($facultyMember['created_at'])) ?>
                     </div>
                 </div>
-                <div class="col-md-4 text-end">
-                    <button class="btn btn-edit me-2" onclick="editFaculty(<?= $facultyMember['user_id'] ?>)">
-                        <i class="fas fa-edit me-1"></i>
+                <div class="flex space-x-2">
+                    <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded text-sm transition-all duration-300" onclick="editFaculty(<?= $facultyMember['user_id'] ?>)">
+                        <i class="fas fa-edit mr-1"></i>
                         Edit
                     </button>
-                    <button class="btn btn-delete" onclick="deleteFaculty(<?= $facultyMember['user_id'] ?>)">
-                        <i class="fas fa-trash me-1"></i>
+                    <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm transition-all duration-300" onclick="deleteFaculty(<?= $facultyMember['user_id'] ?>)">
+                        <i class="fas fa-trash mr-1"></i>
                         Delete
                     </button>
                 </div>
@@ -196,93 +195,51 @@ function deleteFaculty(facultyId) {
         // TODO: Implement delete functionality
         alert('Delete faculty functionality coming soon!');
     }
+}
 
-    // Add Student Modal
-    function showAddStudentModal() {
-        $('#addStudentModal').modal('show');
-    }
+// Add Student Modal
+function showAddStudentModal() {
+    // TODO: Implement modal
+    alert('Add student modal coming soon!');
+}
 
-    // Handle Add Student Form - Proper MVC approach
-    document.getElementById('addStudentForm').addEventListener('submit', function(e) {
-        // Let the form submit normally - Controller will handle everything
-        // No JavaScript needed for form submission
+// Add Faculty Modal
+function showAddFacultyModal() {
+    // TODO: Implement modal
+    alert('Add faculty modal coming soon!');
+}
+
+// Year-Section Tab Switching
+document.addEventListener('DOMContentLoaded', function() {
+    const yearSectionTabs = document.querySelectorAll('.year-section-tab');
+    const studentSections = document.querySelectorAll('.student-section');
+
+    yearSectionTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const targetSection = this.getAttribute('data-section');
+            
+            // Update active tab
+            yearSectionTabs.forEach(t => {
+                t.classList.remove('active', 'bg-primary-600', 'text-white', 'border-primary-600');
+                t.classList.add('bg-grey-100', 'text-grey-600', 'border-grey-300');
+            });
+            this.classList.add('active', 'bg-primary-600', 'text-white', 'border-primary-600');
+            this.classList.remove('bg-grey-100', 'text-grey-600', 'border-grey-300');
+            
+            // Show/hide sections
+            studentSections.forEach(section => {
+                if (section.id === targetSection) {
+                    section.classList.remove('hidden');
+                } else {
+                    section.classList.add('hidden');
+                }
+            });
+        });
     });
+
+    // Show first section by default
+    if (yearSectionTabs.length > 0) {
+        yearSectionTabs[0].click();
+    }
+});
 </script>
-
-<!-- Add Student Modal -->
-<div class="modal fade" id="addStudentModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="fas fa-user-plus me-2"></i>
-                    Add New Student
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="addStudentForm" action="<?= dirname($_SERVER['SCRIPT_NAME']) ?>/admin/users/add-student" method="POST">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="school_id" class="form-label">School ID *</label>
-                                <input type="text" class="form-control" id="school_id" name="school_id" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="full_name" class="form-label">Full Name *</label>
-                                <input type="text" class="form-control" id="full_name" name="full_name" required>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="year_level" class="form-label">Year Level *</label>
-                                <select class="form-control" id="year_level" name="year_level" required>
-                                    <option value="">Select Year Level</option>
-                                    <option value="1st">1st Year</option>
-                                    <option value="2nd">2nd Year</option>
-                                    <option value="3rd">3rd Year</option>
-                                    <option value="4th">4th Year</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="section" class="form-label">Section *</label>
-                                <select class="form-control" id="section" name="section" required>
-                                    <option value="">Select Section</option>
-                                    <option value="A">Section A</option>
-                                    <option value="B">Section B</option>
-                                    <option value="C">Section C</option>
-                                    <option value="D">Section D</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Leave blank for default password">
-                        <small class="text-muted">Default password will be: School ID + Full Name</small>
-                    </div>
-
-                    <input type="hidden" name="role" value="student">
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times me-2"></i>
-                    Cancel
-                </button>
-                <button type="submit" form="addStudentForm" class="btn btn-primary">
-                    <i class="fas fa-save me-2"></i>
-                    Add Student
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
