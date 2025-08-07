@@ -79,8 +79,16 @@ $router->post('/admin/users/add-student', function() use ($adminController) {
     $adminController->addStudent();
 });
 
+$router->post('/admin/users/edit-student', function() use ($adminController) {
+    $adminController->editStudent();
+});
+
 $router->post('/admin/users/edit/{id}', function($id) use ($adminController) {
     $adminController->editUser($id);
+});
+
+$router->post('/admin/users/delete-student', function() use ($adminController) {
+    $adminController->deleteStudent();
 });
 
 $router->post('/admin/users/delete/{id}', function($id) use ($adminController) {

@@ -217,6 +217,37 @@ class AdminController
     }
 
     /**
+     * Handle edit student request
+     */
+    public function editStudent()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->showError('Invalid request method.');
+            return;
+        }
+
+        $userId = $_POST['user_id'] ?? null;
+        if (!$userId) {
+            $this->showError('User ID is required.');
+            return;
+        }
+
+        $result = $this->userService->updateUser($userId, $_POST);
+        
+        if ($result['success']) {
+            // Store success message in session
+            $_SESSION['success_message'] = $result['message'];
+            // Redirect back to dashboard
+            $this->redirectToDashboard();
+        } else {
+            // Store error message in session
+            $_SESSION['error_message'] = $result['message'];
+            // Redirect back to dashboard
+            $this->redirectToDashboard();
+        }
+    }
+
+    /**
      * Handle delete user request
      */
     public function deleteUser($userId)
@@ -232,6 +263,37 @@ class AdminController
             $this->showSuccess($result['message']);
         } else {
             $this->showError($result['message']);
+        }
+    }
+
+    /**
+     * Handle delete student request
+     */
+    public function deleteStudent()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->showError('Invalid request method.');
+            return;
+        }
+
+        $userId = $_POST['user_id'] ?? null;
+        if (!$userId) {
+            $this->showError('User ID is required.');
+            return;
+        }
+
+        $result = $this->userService->deleteUser($userId);
+        
+        if ($result['success']) {
+            // Store success message in session
+            $_SESSION['success_message'] = $result['message'];
+            // Redirect back to dashboard
+            $this->redirectToDashboard();
+        } else {
+            // Store error message in session
+            $_SESSION['error_message'] = $result['message'];
+            // Redirect back to dashboard
+            $this->redirectToDashboard();
         }
     }
 

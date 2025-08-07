@@ -167,17 +167,34 @@
 <script>
 // Edit Student Function
 function editStudent(studentId) {
+    // TODO: Fetch student data and populate form
     console.log('Edit student:', studentId);
-    // TODO: Implement edit functionality
-    alert('Edit student functionality coming soon!');
+    // For now, show a simple form
+    showEditStudentModal(studentId);
+}
+
+// Show Edit Student Modal
+function showEditStudentModal(studentId) {
+    document.getElementById('editStudentModal').classList.remove('hidden');
+    document.getElementById('editStudentId').value = studentId;
 }
 
 // Delete Student Function
 function deleteStudent(studentId) {
     if (confirm('Are you sure you want to delete this student?')) {
-        console.log('Delete student:', studentId);
-        // TODO: Implement delete functionality
-        alert('Delete student functionality coming soon!');
+        // Create and submit delete form
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '<?= dirname($_SERVER['SCRIPT_NAME']) ?>/admin/users/delete-student';
+        
+        const userIdInput = document.createElement('input');
+        userIdInput.type = 'hidden';
+        userIdInput.name = 'user_id';
+        userIdInput.value = studentId;
+        
+        form.appendChild(userIdInput);
+        document.body.appendChild(form);
+        form.submit();
     }
 }
 
@@ -199,8 +216,17 @@ function deleteFaculty(facultyId) {
 
 // Add Student Modal
 function showAddStudentModal() {
-    // TODO: Implement modal
-    alert('Add student modal coming soon!');
+    document.getElementById('addStudentModal').classList.remove('hidden');
+}
+
+// Close Modal
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.add('hidden');
+}
+
+// Reset Form Fields
+function resetForm(formId) {
+    document.getElementById(formId).reset();
 }
 
 // Add Faculty Modal
@@ -237,9 +263,232 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Show first section by default
-    if (yearSectionTabs.length > 0) {
-        yearSectionTabs[0].click();
+         // Show first section by default
+     if (yearSectionTabs.length > 0) {
+         yearSectionTabs[0].click();
+     }
+ });
+ </script>
+
+<!-- Edit Student Modal -->
+<div id="editStudentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center p-6 border-b border-grey-200">
+            <h3 class="text-xl font-semibold text-grey-800">
+                <i class="fas fa-edit mr-2 text-primary-600"></i>
+                Edit Student
+            </h3>
+            <button onclick="closeModal('editStudentModal')" class="text-grey-400 hover:text-grey-600 transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="p-6">
+            <form id="editStudentForm" action="<?= dirname($_SERVER['SCRIPT_NAME']) ?>/admin/users/edit-student" method="POST">
+                <input type="hidden" id="editStudentId" name="user_id">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="edit_school_id" class="block text-sm font-medium text-grey-700 mb-2">School ID *</label>
+                        <input type="text" id="edit_school_id" name="school_id" required 
+                               class="w-full px-3 py-2 border border-grey-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label for="edit_full_name" class="block text-sm font-medium text-grey-700 mb-2">Full Name *</label>
+                        <input type="text" id="edit_full_name" name="full_name" required 
+                               class="w-full px-3 py-2 border border-grey-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="edit_year_level" class="block text-sm font-medium text-grey-700 mb-2">Year Level *</label>
+                        <select id="edit_year_level" name="year_level" required 
+                                class="w-full px-3 py-2 border border-grey-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                            <option value="">Select Year Level</option>
+                            <option value="1st">1st Year</option>
+                            <option value="2nd">2nd Year</option>
+                            <option value="3rd">3rd Year</option>
+                            <option value="4th">4th Year</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="edit_section" class="block text-sm font-medium text-grey-700 mb-2">Section *</label>
+                        <select id="edit_section" name="section" required 
+                                class="w-full px-3 py-2 border border-grey-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                            <option value="">Select Section</option>
+                            <option value="A">Section A</option>
+                            <option value="B">Section B</option>
+                            <option value="C">Section C</option>
+                            <option value="D">Section D</option>
+                        </select>
+                    </div>
+                </div>
+
+                <input type="hidden" name="role" value="student">
+            </form>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="flex justify-end space-x-3 p-6 border-t border-grey-200">
+            <button onclick="closeModal('editStudentModal')" 
+                    class="px-4 py-2 text-grey-600 bg-grey-100 hover:bg-grey-200 rounded-lg transition-colors">
+                <i class="fas fa-times mr-2"></i>
+                Cancel
+            </button>
+            <button onclick="submitEditForm()" 
+                    class="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-semibold transition-colors">
+                <i class="fas fa-save mr-2"></i>
+                Update Student
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Submit edit form function
+function submitEditForm() {
+    const form = document.getElementById('editStudentForm');
+    if (form.checkValidity()) {
+        // Submit form to controller
+        form.submit();
+        // Close modal after submission
+        setTimeout(() => {
+            closeModal('editStudentModal');
+        }, 100);
+    } else {
+        // Show validation errors
+        form.reportValidity();
     }
+}
+
+// Close edit modal when clicking outside
+document.addEventListener('DOMContentLoaded', function() {
+    const editModal = document.getElementById('editStudentModal');
+    editModal.addEventListener('click', function(e) {
+        if (e.target === editModal) {
+            closeModal('editStudentModal');
+        }
+    });
+});
+</script>
+
+<!-- Add Student Modal -->
+<div id="addStudentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center p-6 border-b border-grey-200">
+            <h3 class="text-xl font-semibold text-grey-800">
+                <i class="fas fa-user-plus mr-2 text-primary-600"></i>
+                Add New Student
+            </h3>
+            <button onclick="closeModal('addStudentModal')" class="text-grey-400 hover:text-grey-600 transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="p-6">
+            <form id="addStudentForm" action="<?= dirname($_SERVER['SCRIPT_NAME']) ?>/admin/users/add-student" method="POST" onsubmit="handleFormSubmit(event)">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="school_id" class="block text-sm font-medium text-grey-700 mb-2">School ID *</label>
+                        <input type="text" id="school_id" name="school_id" required 
+                               class="w-full px-3 py-2 border border-grey-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label for="full_name" class="block text-sm font-medium text-grey-700 mb-2">Full Name *</label>
+                        <input type="text" id="full_name" name="full_name" required 
+                               class="w-full px-3 py-2 border border-grey-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="year_level" class="block text-sm font-medium text-grey-700 mb-2">Year Level *</label>
+                        <select id="year_level" name="year_level" required 
+                                class="w-full px-3 py-2 border border-grey-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                            <option value="">Select Year Level</option>
+                            <option value="1st">1st Year</option>
+                            <option value="2nd">2nd Year</option>
+                            <option value="3rd">3rd Year</option>
+                            <option value="4th">4th Year</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="section" class="block text-sm font-medium text-grey-700 mb-2">Section *</label>
+                        <select id="section" name="section" required 
+                                class="w-full px-3 py-2 border border-grey-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                            <option value="">Select Section</option>
+                            <option value="A">Section A</option>
+                            <option value="B">Section B</option>
+                            <option value="C">Section C</option>
+                            <option value="D">Section D</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label for="password" class="block text-sm font-medium text-grey-700 mb-2">Password</label>
+                    <input type="password" id="password" name="password" 
+                           placeholder="Leave blank for default password"
+                           class="w-full px-3 py-2 border border-grey-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                    <p class="text-xs text-grey-500 mt-1">Default password will be: School ID + Full Name</p>
+                </div>
+
+                <input type="hidden" name="role" value="student">
+            </form>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="flex justify-end space-x-3 p-6 border-t border-grey-200">
+            <button onclick="closeModal('addStudentModal')" 
+                    class="px-4 py-2 text-grey-600 bg-grey-100 hover:bg-grey-200 rounded-lg transition-colors">
+                <i class="fas fa-times mr-2"></i>
+                Cancel
+            </button>
+            <button onclick="submitForm()" 
+                    class="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-semibold transition-colors">
+                <i class="fas fa-save mr-2"></i>
+                Add Student
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Handle form submission
+function handleFormSubmit(event) {
+    // Form will submit normally to controller
+    // Controller will handle validation and redirect
+}
+
+// Submit form function
+function submitForm() {
+    const form = document.getElementById('addStudentForm');
+    if (form.checkValidity()) {
+        // Submit form to controller
+        form.submit();
+        // Reset form fields after submission
+        setTimeout(() => {
+            resetForm('addStudentForm');
+            closeModal('addStudentModal');
+        }, 100);
+    } else {
+        // Show validation errors
+        form.reportValidity();
+    }
+}
+
+// Close modal when clicking outside
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('addStudentModal');
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeModal('addStudentModal');
+        }
+    });
 });
 </script>
