@@ -200,17 +200,34 @@ function deleteStudent(studentId) {
 
 // Edit Faculty Function
 function editFaculty(facultyId) {
+    // TODO: Fetch faculty data and populate form
     console.log('Edit faculty:', facultyId);
-    // TODO: Implement edit functionality
-    alert('Edit faculty functionality coming soon!');
+    // For now, show a simple form
+    showEditFacultyModal(facultyId);
+}
+
+// Show Edit Faculty Modal
+function showEditFacultyModal(facultyId) {
+    document.getElementById('editFacultyModal').classList.remove('hidden');
+    document.getElementById('editFacultyId').value = facultyId;
 }
 
 // Delete Faculty Function
 function deleteFaculty(facultyId) {
     if (confirm('Are you sure you want to delete this faculty member?')) {
-        console.log('Delete faculty:', facultyId);
-        // TODO: Implement delete functionality
-        alert('Delete faculty functionality coming soon!');
+        // Create and submit delete form
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '<?= dirname($_SERVER['SCRIPT_NAME']) ?>/admin/users/delete-faculty';
+        
+        const userIdInput = document.createElement('input');
+        userIdInput.type = 'hidden';
+        userIdInput.name = 'user_id';
+        userIdInput.value = facultyId;
+        
+        form.appendChild(userIdInput);
+        document.body.appendChild(form);
+        form.submit();
     }
 }
 
@@ -231,8 +248,7 @@ function resetForm(formId) {
 
 // Add Faculty Modal
 function showAddFacultyModal() {
-    // TODO: Implement modal
-    alert('Add faculty modal coming soon!');
+    document.getElementById('addFacultyModal').classList.remove('hidden');
 }
 
 // Year-Section Tab Switching
@@ -488,6 +504,179 @@ document.addEventListener('DOMContentLoaded', function() {
     modal.addEventListener('click', function(e) {
         if (e.target === modal) {
             closeModal('addStudentModal');
+        }
+    });
+});
+</script>
+
+<!-- Edit Faculty Modal -->
+<div id="editFacultyModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center p-6 border-b border-grey-200">
+            <h3 class="text-xl font-semibold text-grey-800">
+                <i class="fas fa-edit mr-2 text-primary-600"></i>
+                Edit Faculty
+            </h3>
+            <button onclick="closeModal('editFacultyModal')" class="text-grey-400 hover:text-grey-600 transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="p-6">
+            <form id="editFacultyForm" action="<?= dirname($_SERVER['SCRIPT_NAME']) ?>/admin/users/edit-faculty" method="POST">
+                <input type="hidden" id="editFacultyId" name="user_id">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="edit_faculty_school_id" class="block text-sm font-medium text-grey-700 mb-2">School ID *</label>
+                        <input type="text" id="edit_faculty_school_id" name="school_id" required 
+                               class="w-full px-3 py-2 border border-grey-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label for="edit_faculty_full_name" class="block text-sm font-medium text-grey-700 mb-2">Full Name *</label>
+                        <input type="text" id="edit_faculty_full_name" name="full_name" required 
+                               class="w-full px-3 py-2 border border-grey-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                    </div>
+                </div>
+
+                <input type="hidden" name="role" value="faculty">
+            </form>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="flex justify-end space-x-3 p-6 border-t border-grey-200">
+            <button onclick="closeModal('editFacultyModal')" 
+                    class="px-4 py-2 text-grey-600 bg-grey-100 hover:bg-grey-200 rounded-lg transition-colors">
+                <i class="fas fa-times mr-2"></i>
+                Cancel
+            </button>
+            <button onclick="submitEditFacultyForm()" 
+                    class="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-semibold transition-colors">
+                <i class="fas fa-save mr-2"></i>
+                Update Faculty
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Submit edit faculty form function
+function submitEditFacultyForm() {
+    const form = document.getElementById('editFacultyForm');
+    if (form.checkValidity()) {
+        // Submit form to controller
+        form.submit();
+        // Close modal after submission
+        setTimeout(() => {
+            closeModal('editFacultyModal');
+        }, 100);
+    } else {
+        // Show validation errors
+        form.reportValidity();
+    }
+}
+
+// Close edit faculty modal when clicking outside
+document.addEventListener('DOMContentLoaded', function() {
+    const editFacultyModal = document.getElementById('editFacultyModal');
+    editFacultyModal.addEventListener('click', function(e) {
+        if (e.target === editFacultyModal) {
+            closeModal('editFacultyModal');
+        }
+    });
+});
+</script>
+
+<!-- Add Faculty Modal -->
+<div id="addFacultyModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center p-6 border-b border-grey-200">
+            <h3 class="text-xl font-semibold text-grey-800">
+                <i class="fas fa-user-plus mr-2 text-primary-600"></i>
+                Add New Faculty
+            </h3>
+            <button onclick="closeModal('addFacultyModal')" class="text-grey-400 hover:text-grey-600 transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="p-6">
+            <form id="addFacultyForm" action="<?= dirname($_SERVER['SCRIPT_NAME']) ?>/admin/users/add-faculty" method="POST" onsubmit="handleFacultyFormSubmit(event)">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="faculty_school_id" class="block text-sm font-medium text-grey-700 mb-2">School ID *</label>
+                        <input type="text" id="faculty_school_id" name="school_id" required 
+                               class="w-full px-3 py-2 border border-grey-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label for="faculty_full_name" class="block text-sm font-medium text-grey-700 mb-2">Full Name *</label>
+                        <input type="text" id="faculty_full_name" name="full_name" required 
+                               class="w-full px-3 py-2 border border-grey-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label for="faculty_password" class="block text-sm font-medium text-grey-700 mb-2">Password</label>
+                    <input type="password" id="faculty_password" name="password" 
+                           placeholder="Leave blank for default password"
+                           class="w-full px-3 py-2 border border-grey-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                    <p class="text-xs text-grey-500 mt-1">Default password will be: School ID + Full Name</p>
+                </div>
+
+                <input type="hidden" name="role" value="faculty">
+            </form>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="flex justify-end space-x-3 p-6 border-t border-grey-200">
+            <button onclick="closeModal('addFacultyModal')" 
+                    class="px-4 py-2 text-grey-600 bg-grey-100 hover:bg-grey-200 rounded-lg transition-colors">
+                <i class="fas fa-times mr-2"></i>
+                Cancel
+            </button>
+            <button onclick="submitFacultyForm()" 
+                    class="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-semibold transition-colors">
+                <i class="fas fa-save mr-2"></i>
+                Add Faculty
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Handle faculty form submission
+function handleFacultyFormSubmit(event) {
+    // Form will submit normally to controller
+    // Controller will handle validation and redirect
+}
+
+// Submit faculty form function
+function submitFacultyForm() {
+    const form = document.getElementById('addFacultyForm');
+    if (form.checkValidity()) {
+        // Submit form to controller
+        form.submit();
+        // Reset form fields after submission
+        setTimeout(() => {
+            resetForm('addFacultyForm');
+            closeModal('addFacultyModal');
+        }, 100);
+    } else {
+        // Show validation errors
+        form.reportValidity();
+    }
+}
+
+// Close faculty modal when clicking outside
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('addFacultyModal');
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeModal('addFacultyModal');
         }
     });
 });

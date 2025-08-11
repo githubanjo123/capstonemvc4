@@ -298,6 +298,113 @@ class AdminController
     }
 
     /**
+     * Add a new faculty member
+     */
+    public function addFaculty()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->showError('Invalid request method');
+            return;
+        }
+
+        $data = [
+            'school_id' => $_POST['school_id'] ?? '',
+            'full_name' => $_POST['full_name'] ?? '',
+            'role' => 'faculty',
+            'password' => $_POST['password'] ?? ''
+        ];
+
+        // Validate required fields
+        if (empty($data['school_id']) || empty($data['full_name'])) {
+            $this->showError('School ID and Full Name are required');
+            return;
+        }
+
+        try {
+            $result = $this->userService->createUser($data);
+            
+            if ($result['success']) {
+                $this->showSuccess('Faculty member added successfully');
+            } else {
+                $this->showError($result['message']);
+            }
+        } catch (Exception $e) {
+            $this->showError('Error adding faculty member: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Edit an existing faculty member
+     */
+    public function editFaculty()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->showError('Invalid request method');
+            return;
+        }
+
+        $userId = $_POST['user_id'] ?? '';
+        if (empty($userId)) {
+            $this->showError('User ID is required');
+            return;
+        }
+
+        $data = [
+            'user_id' => $userId,
+            'school_id' => $_POST['school_id'] ?? '',
+            'full_name' => $_POST['full_name'] ?? '',
+            'role' => 'faculty'
+        ];
+
+        // Validate required fields
+        if (empty($data['school_id']) || empty($data['full_name'])) {
+            $this->showError('School ID and Full Name are required');
+            return;
+        }
+
+        try {
+            $result = $this->userService->updateUser($data);
+            
+            if ($result['success']) {
+                $this->showSuccess('Faculty member updated successfully');
+            } else {
+                $this->showError($result['message']);
+            }
+        } catch (Exception $e) {
+            $this->showError('Error updating faculty member: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Delete a faculty member
+     */
+    public function deleteFaculty()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->showError('Invalid request method');
+            return;
+        }
+
+        $userId = $_POST['user_id'] ?? '';
+        if (empty($userId)) {
+            $this->showError('User ID is required');
+            return;
+        }
+
+        try {
+            $result = $this->userService->deleteUser($userId);
+            
+            if ($result['success']) {
+                $this->showSuccess('Faculty member deleted successfully');
+            } else {
+                $this->showError($result['message']);
+            }
+        } catch (Exception $e) {
+            $this->showError('Error deleting faculty member: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Show success message
      */
     private function showSuccess($message)

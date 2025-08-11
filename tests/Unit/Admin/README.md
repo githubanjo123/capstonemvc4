@@ -4,24 +4,41 @@ This directory contains comprehensive unit tests for the `AdminController` class
 
 ## Test Coverage
 
-The test suite covers all public and private methods of the `AdminController`:
+The `AdminControllerTest` covers **28 test methods** including:
 
-### Public Methods
+### Core Admin Functionality
 - `dashboard()` - Admin dashboard display with user data
-- `logout()` - User logout handling
-- `addUser()` - User creation (general users)
-- `addStudent()` - Student creation
-- `editUser()` - User editing (general users)
-- `editStudent()` - Student editing
-- `deleteUser()` - User deletion (general users)
-- `deleteStudent()` - Student deletion
+- `logout()` - Logout handling and confirmation
+- `showLogoutConfirmation()` - Logout confirmation page display
 
-### Private Methods
-- `showLogoutConfirmation()` - Logout confirmation page
-- `getYearSections()` - Year-section calculation from student data
-- `redirectToDashboard()` - Dashboard redirection
+### Student Management (8 tests)
+- `addStudent()` - Adding new students
+- `editStudent()` - Editing existing students  
+- `deleteStudent()` - Deleting students
+- Validation handling for missing fields
+- Error handling for invalid requests
+
+### Faculty Management (8 tests)
+- `addFaculty()` - Adding new faculty members
+- `editFaculty()` - Editing existing faculty members
+- `deleteFaculty()` - Deleting faculty members
+- Validation handling for missing fields
+- Error handling for invalid requests
+
+### General User Management (4 tests)
+- `addUser()` - Adding general users
+- `editUser()` - Editing general users
+- `deleteUser()` - Deleting general users
+- Parameter validation
+
+### Utility Methods (3 tests)
+- `getYearSections()` - Year-section grouping logic
 - `showSuccess()` - Success message display
 - `showError()` - Error message display
+
+### Helper Methods (2 tests)
+- `redirectToDashboard()` - Dashboard redirection
+- `requireAuth()` - Authentication requirement
 
 ## Test Scenarios
 

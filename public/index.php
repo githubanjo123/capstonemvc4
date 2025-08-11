@@ -91,6 +91,19 @@ $router->post('/admin/users/delete-student', function() use ($adminController) {
     $adminController->deleteStudent();
 });
 
+// Admin Faculty Management Routes
+$router->post('/admin/users/add-faculty', function() use ($adminController) {
+    $adminController->addFaculty();
+});
+
+$router->post('/admin/users/edit-faculty', function() use ($adminController) {
+    $adminController->editFaculty();
+});
+
+$router->post('/admin/users/delete-faculty', function() use ($adminController) {
+    $adminController->deleteFaculty();
+});
+
 $router->post('/admin/users/delete/{id}', function($id) use ($adminController) {
     $adminController->deleteUser($id);
 });

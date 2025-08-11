@@ -589,4 +589,179 @@ class AdminControllerTest extends TestCase
             $this->assertTrue(true);
         }
     }
+
+    /**
+     * @test
+     */
+    public function it_should_handle_delete_student_without_user_id()
+    {
+        $_POST = [];
+        
+        $response = $this->invokePrivateMethod('deleteStudent');
+        
+        $this->assertIsArray($response);
+        $this->assertArrayHasKey('message', $response);
+        $this->assertStringContainsString('User ID is required', $response['message']);
+        
+        $this->userServiceMock
+            ->expects($this->never())
+            ->method('deleteUser');
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_add_faculty_successfully()
+    {
+        $_POST = [
+            'school_id' => 'FAC003',
+            'full_name' => 'Dr. New Faculty',
+            'password' => 'password123'
+        ];
+        
+        $this->userServiceMock
+            ->expects($this->once())
+            ->method('createUser')
+            ->with([
+                'school_id' => 'FAC003',
+                'full_name' => 'Dr. New Faculty',
+                'role' => 'faculty',
+                'password' => 'password123'
+            ])
+            ->willReturn(['success' => true]);
+        
+        ob_start();
+        $this->invokePrivateMethod('addFaculty');
+        $output = ob_get_clean();
+        
+        $this->assertStringContainsString('Faculty member added successfully', $output);
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_handle_add_faculty_with_missing_fields()
+    {
+        $_POST = [
+            'school_id' => '',
+            'full_name' => ''
+        ];
+        
+        $this->userServiceMock
+            ->expects($this->never())
+            ->method('createUser');
+        
+        ob_start();
+        $this->invokePrivateMethod('addFaculty');
+        $output = ob_get_clean();
+        
+        $this->assertStringContainsString('School ID and Full Name are required', $output);
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_edit_faculty_successfully()
+    {
+        $_POST = [
+            'user_id' => '2',
+            'school_id' => 'FAC001',
+            'full_name' => 'Dr. John Smith Updated'
+        ];
+        
+        $this->userServiceMock
+            ->expects($this->once())
+            ->method('updateUser')
+            ->with([
+                'user_id' => '2',
+                'school_id' => 'FAC001',
+                'full_name' => 'Dr. John Smith Updated',
+                'role' => 'faculty'
+            ])
+            ->willReturn(['success' => true]);
+        
+        ob_start();
+        $this->invokePrivateMethod('editFaculty');
+        $output = ob_get_clean();
+        
+        $this->assertStringContainsString('Faculty member updated successfully', $output);
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_handle_edit_faculty_without_user_id()
+    {
+        $_POST = [];
+        
+        $this->userServiceMock
+            ->expects($this->never())
+            ->method('updateUser');
+        
+        ob_start();
+        $this->invokePrivateMethod('editFaculty');
+        $output = ob_get_clean();
+        
+        $this->assertStringContainsString('User ID is required', $output);
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_handle_edit_faculty_with_missing_fields()
+    {
+        $_POST = [
+            'user_id' => '2',
+            'school_id' => '',
+            'full_name' => ''
+        ];
+        
+        $this->userServiceMock
+            ->expects($this->never())
+            ->method('updateUser');
+        
+        ob_start();
+        $this->invokePrivateMethod('editFaculty');
+        $output = ob_get_clean();
+        
+        $this->assertStringContainsString('School ID and Full Name are required', $output);
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_delete_faculty_successfully()
+    {
+        $_POST = ['user_id' => '2'];
+        
+        $this->userServiceMock
+            ->expects($this->once())
+            ->method('deleteUser')
+            ->with('2')
+            ->willReturn(['success' => true]);
+        
+        ob_start();
+        $this->invokePrivateMethod('deleteFaculty');
+        $output = ob_get_clean();
+        
+        $this->assertStringContainsString('Faculty member deleted successfully', $output);
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_handle_delete_faculty_without_user_id()
+    {
+        $_POST = [];
+        
+        $this->userServiceMock
+            ->expects($this->never())
+            ->method('deleteUser');
+        
+        ob_start();
+        $this->invokePrivateMethod('deleteFaculty');
+        $output = ob_get_clean();
+        
+        $this->assertStringContainsString('User ID is required', $output);
+    }
 }
