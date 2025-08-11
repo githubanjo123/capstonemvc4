@@ -12,8 +12,20 @@ class AuthControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->authController = new AuthController();
+        
+        // Ensure clean session state
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_unset();
+            session_destroy();
+        }
         $_SESSION = [];
+        
+        // Start a fresh session for testing
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        $this->authController = new AuthController();
         $_SERVER['SCRIPT_NAME'] = '/index.php';
     }
 

@@ -12,7 +12,19 @@ class AdminControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        
+        // Ensure clean session state
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_unset();
+            session_destroy();
+        }
         $_SESSION = [];
+        
+        // Start a fresh session for testing
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
         $_SERVER['SCRIPT_NAME'] = '/index.php';
         $this->adminController = new AdminController();
     }
@@ -31,7 +43,6 @@ class AdminControllerTest extends TestCase
     public function it_should_display_admin_dashboard_with_user_data()
     {
         // Simulate a logged-in admin
-        if (session_status() === PHP_SESSION_NONE) { session_start(); }
         $_SESSION['user_id'] = 1;
         $_SESSION['school_id'] = 'admin-001';
         $_SESSION['full_name'] = 'Admin User';
@@ -48,8 +59,8 @@ class AdminControllerTest extends TestCase
     /** @test */
     public function it_should_handle_successful_student_creation()
     {
-        if (session_status() === PHP_SESSION_NONE) { session_start(); }
-        $_SESSION['user_id'] = 1; $_SESSION['role'] = 'admin';
+        $_SESSION['user_id'] = 1; 
+        $_SESSION['role'] = 'admin';
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST['school_id'] = 'STU_' . uniqid();
@@ -69,8 +80,8 @@ class AdminControllerTest extends TestCase
     /** @test */
     public function it_should_handle_failed_student_creation()
     {
-        if (session_status() === PHP_SESSION_NONE) { session_start(); }
-        $_SESSION['user_id'] = 1; $_SESSION['role'] = 'admin';
+        $_SESSION['user_id'] = 1; 
+        $_SESSION['role'] = 'admin';
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST['school_id'] = ''; // missing fields cause failure
@@ -87,8 +98,8 @@ class AdminControllerTest extends TestCase
     /** @test */
     public function it_should_handle_successful_student_update()
     {
-        if (session_status() === PHP_SESSION_NONE) { session_start(); }
-        $_SESSION['user_id'] = 1; $_SESSION['role'] = 'admin';
+        $_SESSION['user_id'] = 1; 
+        $_SESSION['role'] = 'admin';
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST['user_id'] = '999999'; // non-existent => handled path
@@ -108,8 +119,8 @@ class AdminControllerTest extends TestCase
     /** @test */
     public function it_should_handle_successful_student_deletion()
     {
-        if (session_status() === PHP_SESSION_NONE) { session_start(); }
-        $_SESSION['user_id'] = 1; $_SESSION['role'] = 'admin';
+        $_SESSION['user_id'] = 1; 
+        $_SESSION['role'] = 'admin';
 
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST['user_id'] = '999999';
@@ -124,8 +135,8 @@ class AdminControllerTest extends TestCase
     /** @test */
     public function it_should_handle_admin_logout()
     {
-        if (session_status() === PHP_SESSION_NONE) { session_start(); }
-        $_SESSION['user_id'] = 1; $_SESSION['role'] = 'admin';
+        $_SESSION['user_id'] = 1; 
+        $_SESSION['role'] = 'admin';
 
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_GET['confirm'] = 'true';
@@ -140,8 +151,8 @@ class AdminControllerTest extends TestCase
     /** @test */
     public function it_should_show_confirmation_page_when_admin_logout_not_confirmed()
     {
-        if (session_status() === PHP_SESSION_NONE) { session_start(); }
-        $_SESSION['user_id'] = 1; $_SESSION['role'] = 'admin';
+        $_SESSION['user_id'] = 1; 
+        $_SESSION['role'] = 'admin';
 
         $_SERVER['REQUEST_METHOD'] = 'GET';
         unset($_GET['confirm']);
@@ -157,8 +168,8 @@ class AdminControllerTest extends TestCase
     /** @test */
     public function it_should_get_year_sections_from_students()
     {
-        if (session_status() === PHP_SESSION_NONE) { session_start(); }
-        $_SESSION['user_id'] = 1; $_SESSION['role'] = 'admin';
+        $_SESSION['user_id'] = 1; 
+        $_SESSION['role'] = 'admin';
 
         // Call private getYearSections via reflection using sample data
         $students = [

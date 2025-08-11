@@ -108,6 +108,7 @@ class Router
 
         $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
         $subdirectory = dirname($scriptName);
+        
         if ($subdirectory !== '/' && $subdirectory !== '.' && strpos($path, $subdirectory) === 0) {
             $path = substr($path, strlen($subdirectory));
             if ($path === '') {

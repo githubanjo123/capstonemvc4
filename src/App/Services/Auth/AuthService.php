@@ -8,9 +8,9 @@ class AuthService
 {
     private $userDAO;
 
-    public function __construct()
+    public function __construct(UserDAO $userDAO = null)
     {
-        $this->userDAO = new UserDAO();
+        $this->userDAO = $userDAO ?? new UserDAO();
     }
 
     /**
@@ -18,8 +18,8 @@ class AuthService
      */
     public function login($school_id, $password)
     {
-        // Validate inputs
-        if (empty($school_id) || empty($password)) {
+        // Validate inputs - check if trimmed values are empty
+        if (empty(trim($school_id)) || empty(trim($password))) {
             return [
                 'success' => false,
                 'message' => 'School ID and password are required.'
@@ -76,8 +76,22 @@ class AuthService
             session_start();
         }
 
+        // Clear session data
+        session_unset();
+        
         // Destroy session
         session_destroy();
+        
+        // Clear the $_SESSION array as well
+        $_SESSION = [];
+        
+        // Additional cleanup to ensure session is completely cleared
+        if (function_exists('session_write_close')) {
+            session_write_close();
+        }
+        
+        // Force clear the session array again to be absolutely sure
+        $_SESSION = [];
 
         return [
             'success' => true,
@@ -103,6 +117,12 @@ class AuthService
     public function getCurrentUser()
     {
         if (!$this->isAuthenticated()) {
+            return null;
+        }
+
+        // Check if all required session variables exist
+        if (!isset($_SESSION['user_id']) || !isset($_SESSION['school_id']) || 
+            !isset($_SESSION['full_name']) || !isset($_SESSION['role'])) {
             return null;
         }
 
@@ -146,6 +166,14 @@ class AuthService
         }
 
         $user = $this->getCurrentUser();
+        if (!$user || !isset($user['role'])) {
+            return [
+                'success' => false,
+                'message' => 'User data incomplete.',
+                'redirect' => '/login'
+            ];
+        }
+        
         if ($user['role'] !== $requiredRole) {
             return [
                 'success' => false,
