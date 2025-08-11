@@ -18,8 +18,8 @@ class AuthService
      */
     public function login($school_id, $password)
     {
-        // Validate inputs
-        if (empty($school_id) || empty($password)) {
+        // Validate inputs - check if trimmed values are empty
+        if (empty(trim($school_id)) || empty(trim($password))) {
             return [
                 'success' => false,
                 'message' => 'School ID and password are required.'

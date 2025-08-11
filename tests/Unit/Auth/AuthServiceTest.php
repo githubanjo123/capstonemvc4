@@ -18,24 +18,35 @@ class AuthServiceTest extends TestCase
         // Create a mock for UserDAO
         $this->userDAOMock = $this->createMock(UserDAO::class);
         
-        // Create AuthService with the mock
-        $this->authService = new AuthService($this->userDAOMock);
+        // Use reflection to inject the mock into AuthService
+        $this->authService = new AuthService();
+        $reflection = new \ReflectionClass($this->authService);
+        $property = $reflection->getProperty('userDAO');
+        $property->setAccessible(true);
+        $property->setValue($this->authService, $this->userDAOMock);
         
-        // Ensure session isolation
+        // Ensure clean session state
         if (session_status() === PHP_SESSION_ACTIVE) {
             session_unset();
             session_destroy();
         }
         $_SESSION = [];
+        
+        // Start a fresh session for testing
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
     }
 
     protected function tearDown(): void
     {
+        // Clean up session
         if (session_status() === PHP_SESSION_ACTIVE) {
             session_unset();
             session_destroy();
         }
         $_SESSION = [];
+        
         parent::tearDown();
     }
 
