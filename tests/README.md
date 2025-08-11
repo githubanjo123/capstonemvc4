@@ -22,13 +22,13 @@ This project uses PHPUnit for testing with a comprehensive test suite covering u
 
 ## Test Counts
 
-### Total Test Methods: **39**
-- **Unit Tests**: 28 methods
+### Total Test Methods: **38**
+- **Unit Tests**: 27 methods
 - **Integration Tests**: 11 methods  
 - **MVC Tests**: 6 methods
 
 ### Recent Additions
-- **Faculty Management Tests**: 8 new unit tests + 5 new integration tests
+- **Faculty Management Tests**: 7 new unit tests + 5 new integration tests
 - **Complete CRUD Coverage**: Add, edit, delete operations for both students and faculty
 
 ## Running Tests
@@ -59,7 +59,7 @@ vendor/bin/phpunit --coverage-html coverage/
 
 ### 1. **Admin Management Tests** (Most Comprehensive)
 - **Location**: `tests/Unit/Admin/AdminControllerTest.php`
-- **Coverage**: 28 test methods
+- **Coverage**: 27 test methods
 - **Features**: Dashboard, user management, student management, **faculty management**
 - **Mock Strategy**: Complete dependency isolation
 

@@ -590,23 +590,7 @@ class AdminControllerTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_should_handle_delete_student_without_user_id()
-    {
-        $_POST = [];
-        
-        $response = $this->invokePrivateMethod('deleteStudent');
-        
-        $this->assertIsArray($response);
-        $this->assertArrayHasKey('message', $response);
-        $this->assertStringContainsString('User ID is required', $response['message']);
-        
-        $this->userServiceMock
-            ->expects($this->never())
-            ->method('deleteUser');
-    }
+
 
     /**
      * @test

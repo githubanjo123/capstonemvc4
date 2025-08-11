@@ -4,7 +4,7 @@ This directory contains comprehensive unit tests for the `AdminController` class
 
 ## Test Coverage
 
-The `AdminControllerTest` covers **28 test methods** including:
+The `AdminControllerTest` covers **27 test methods** including:
 
 ### Core Admin Functionality
 - `dashboard()` - Admin dashboard display with user data
