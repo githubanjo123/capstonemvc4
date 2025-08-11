@@ -18,7 +18,7 @@ The `AdminControllerTest` covers **28 test methods** including:
 - Validation handling for missing fields
 - Error handling for invalid requests
 
-### Faculty Management (8 tests)
+### Faculty Management (8 tests) ✨ **NEW**
 - `addFaculty()` - Adding new faculty members
 - `editFaculty()` - Editing existing faculty members
 - `deleteFaculty()` - Deleting faculty members
@@ -44,32 +44,45 @@ The `AdminControllerTest` covers **28 test methods** including:
 
 ### Dashboard Tests
 - ✅ Display admin dashboard with user data
-- ✅ Generate year sections correctly from student data
+- ✅ Show students organized by year and section
+- ✅ Show faculty members list
+- ✅ Handle empty user lists gracefully
 
-### Authentication Tests
+### Student Management Tests
+- ✅ Add student with valid data
+- ✅ Add student with missing required fields
+- ✅ Edit student successfully
+- ✅ Edit student without user ID
+- ✅ Delete student successfully
+- ✅ Delete student without user ID
+
+### Faculty Management Tests ✨ **NEW**
+- ✅ Add faculty with valid data
+- ✅ Add faculty with missing required fields
+- ✅ Edit faculty successfully
+- ✅ Edit faculty without user ID
+- ✅ Edit faculty with missing fields
+- ✅ Delete faculty successfully
+- ✅ Delete faculty without user ID
+
+### General User Management Tests
+- ✅ Add user with valid data
+- ✅ Edit user with valid data
+- ✅ Delete user with valid data
+- ✅ Handle missing user ID parameter
+
+### Authentication & Security Tests
+- ✅ Require authentication for all operations
+- ✅ Require admin role for access
 - ✅ Handle logout with confirmation
 - ✅ Show logout confirmation page
 
-### User Management Tests
-- ✅ Add user successfully
-- ✅ Handle add user failure
-- ✅ Reject add user with invalid request method
-- ✅ Edit user successfully
-- ✅ Delete user successfully
-- ✅ Reject delete user with invalid request method
-
-### Student Management Tests
-- ✅ Add student successfully
-- ✅ Handle add student failure
-- ✅ Edit student successfully
-- ✅ Handle edit student without user ID
-- ✅ Delete student successfully
-- ✅ Handle delete student without user ID
-
-### Utility Method Tests
-- ✅ Show success message
-- ✅ Show error message
-- ✅ Redirect to dashboard (method execution verification)
+### Error Handling Tests
+- ✅ Handle invalid request methods
+- ✅ Handle missing required fields
+- ✅ Handle service layer errors
+- ✅ Display appropriate error messages
+- ✅ Display success confirmations
 
 ## How to Run
 
