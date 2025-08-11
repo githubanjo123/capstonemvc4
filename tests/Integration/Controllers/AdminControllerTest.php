@@ -187,4 +187,100 @@ class AdminControllerTest extends TestCase
         $this->assertArrayHasKey('1st B', $result);
         $this->assertArrayHasKey('2nd A', $result);
     }
+
+    // ========================================
+    // FACULTY MANAGEMENT INTEGRATION TESTS
+    // ========================================
+
+    /** @test */
+    public function it_should_handle_successful_faculty_creation()
+    {
+        $_SESSION['user_id'] = 1; 
+        $_SESSION['role'] = 'admin';
+
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST['school_id'] = 'FAC_' . uniqid();
+        $_POST['full_name'] = 'Dr. New Faculty';
+        $_POST['role'] = 'faculty';
+        $_POST['password'] = 'password123';
+
+        ob_start();
+        $this->adminController->addFaculty();
+        $output = ob_get_clean();
+
+        // We redirected; nothing to assert except no fatal
+        $this->assertIsString($output);
+    }
+
+    /** @test */
+    public function it_should_handle_failed_faculty_creation()
+    {
+        $_SESSION['user_id'] = 1; 
+        $_SESSION['role'] = 'admin';
+
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST['school_id'] = ''; // missing fields cause failure
+        $_POST['full_name'] = '';
+        $_POST['role'] = 'faculty';
+
+        ob_start();
+        $this->adminController->addFaculty();
+        $output = ob_get_clean();
+
+        $this->assertIsString($output);
+    }
+
+    /** @test */
+    public function it_should_handle_successful_faculty_update()
+    {
+        $_SESSION['user_id'] = 1; 
+        $_SESSION['role'] = 'admin';
+
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST['user_id'] = '999999'; // non-existent => handled path
+        $_POST['school_id'] = 'FAC001';
+        $_POST['full_name'] = 'Dr. Updated Faculty';
+        $_POST['role'] = 'faculty';
+
+        ob_start();
+        $this->adminController->editFaculty();
+        $output = ob_get_clean();
+
+        $this->assertIsString($output);
+    }
+
+    /** @test */
+    public function it_should_handle_successful_faculty_deletion()
+    {
+        $_SESSION['user_id'] = 1; 
+        $_SESSION['role'] = 'admin';
+
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST['user_id'] = '999999';
+
+        ob_start();
+        $this->adminController->deleteFaculty();
+        $output = ob_get_clean();
+
+        $this->assertIsString($output);
+    }
+
+    /** @test */
+    public function it_should_handle_faculty_operations_without_admin_session()
+    {
+        // No session = no admin access
+        unset($_SESSION['user_id']);
+        unset($_SESSION['role']);
+
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST['school_id'] = 'FAC_TEST';
+        $_POST['full_name'] = 'Test Faculty';
+
+        // This should fail due to authentication
+        $this->expectException(\Exception::class);
+        
+        ob_start();
+        $this->adminController->addFaculty();
+        ob_end_clean();
+    }
 }

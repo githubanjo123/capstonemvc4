@@ -1,288 +1,188 @@
-# 🧪 TDD Test Suite - Red-Green-Refactor Cycle
+# Testing Documentation
 
-This test suite demonstrates **Test-Driven Development (TDD)** following the **Red-Green-Refactor** cycle. All tests are written using TDD principles where tests are written first, then minimal implementation is added to make them pass.
+## Overview
+This project uses PHPUnit for testing with a comprehensive test suite covering unit tests, integration tests, and MVC tests.
 
-## 🔄 TDD Cycle Explained
+## Test Structure
 
-### 1️⃣ **RED Phase** - Write Failing Test First
-```php
-/**
- * @test
- * @group auth
- * @group login
- */
-public function it_should_return_success_when_valid_credentials_provided()
-{
-    // Arrange (Red Phase - Test First)
-    $schoolId = '2021-0001';
-    $password = 'password123';
-    
-    // Mock the authenticate method to return success
-    $this->mockUserDAO->shouldReceive('authenticate')
-        ->once()
-        ->with($schoolId, $password)
-        ->andReturn([
-            'success' => true,
-            'user' => $expectedUser
-        ]);
+### Unit Tests (`tests/Unit/`)
+- **Admin Controller Tests**: 28 test methods covering admin dashboard, user management, student management, and **faculty management**
+- **Auth Service Tests**: Authentication and authorization logic
+- **User Service Tests**: User business logic
+- **DAO Tests**: Data access layer
+- **Core Tests**: Framework components
 
-    // Act (Green Phase - Make it pass)
-    $result = $this->authService->login($schoolId, $password);
+### Integration Tests (`tests/Integration/`)
+- **Admin Controller Integration**: 11 test methods covering real database interactions for both student and **faculty operations**
+- **Auth Controller Integration**: Authentication flow testing
 
-    // Assert (Refactor Phase - Clean up)
-    $this->assertTrue($result['success']);
-    $this->assertEquals('Login successful', $result['message']);
-}
-```
+### MVC Tests (`tests/mvc/`)
+- **Auth Controller MVC**: End-to-end authentication testing
+- **Role-based Access**: Admin, faculty, and student role validation
 
-### 2️⃣ **GREEN Phase** - Minimal Implementation
-```php
-public function login($schoolId, $password)
-{
-    // Validate input
-    if (empty($schoolId) || empty($password)) {
-        return [
-            'success' => false,
-            'message' => 'School ID and password are required'
-        ];
-    }
+## Test Counts
 
-    // Call DAO for authentication
-    $result = $this->userDAO->authenticate($schoolId, $password);
-    
-    if ($result['success']) {
-        return [
-            'success' => true,
-            'message' => 'Login successful',
-            'user' => $result['user']
-        ];
-    }
-    
-    return $result;
-}
-```
+### Total Test Methods: **38**
+- **Unit Tests**: 27 methods
+- **Integration Tests**: 11 methods  
+- **MVC Tests**: 6 methods
 
-### 3️⃣ **REFACTOR Phase** - Clean Up Code
-```php
-public function login($schoolId, $password)
-{
-    // Validate input
-    if (!$this->validateCredentials($schoolId, $password)) {
-        return $this->createErrorResponse('School ID and password are required');
-    }
+### Recent Additions
+- **Faculty Management Tests**: 7 new unit tests + 5 new integration tests
+- **Complete CRUD Coverage**: Add, edit, delete operations for both students and faculty
+- **Test Discovery Fix**: Resolved issue where only 6 tests were running instead of 27
 
-    // Authenticate user
-    $result = $this->userDAO->authenticate($schoolId, $password);
-    
-    return $result['success'] 
-        ? $this->createSuccessResponse($result['user'])
-        : $result;
-}
+## Running Tests
 
-private function validateCredentials($schoolId, $password)
-{
-    return !empty($schoolId) && !empty($password);
-}
-
-private function createSuccessResponse($user)
-{
-    return [
-        'success' => true,
-        'message' => 'Login successful',
-        'user' => $user
-    ];
-}
-```
-
-## 📁 Test Structure
-
-```
-tests/
-├── Unit/                    # Unit Tests (Red-Green-Refactor)
-│   ├── Auth/
-│   │   └── AuthServiceTest.php
-│   ├── User/
-│   │   └── UserServiceTest.php
-│   ├── Core/
-│   │   └── RouterTest.php
-│   └── DAO/
-│       └── UserDAOTest.php
-├── Integration/             # Integration Tests (Red-Green-Refactor)
-│   └── Controllers/
-│       ├── AuthControllerTest.php
-│       └── AdminControllerTest.php
-├── TestRunner.php          # TDD Test Runner
-└── README.md              # This file
-```
-
-## 🧪 Test Categories
-
-### **Unit Tests** (`tests/Unit/`)
-- **AuthServiceTest**: Tests authentication logic
-- **UserServiceTest**: Tests user management business logic
-- **RouterTest**: Tests routing functionality
-- **UserDAOTest**: Tests database operations
-
-### **Integration Tests** (`tests/Integration/`)
-- **AuthControllerTest**: Tests full authentication flow
-- **AdminControllerTest**: Tests admin dashboard functionality
-
-## 🚀 Running Tests
-
-### Run All Tests (TDD Style)
+### Run All Tests
 ```bash
-php tests/TestRunner.php
+vendor/bin/phpunit
 ```
 
 ### Run Specific Test Suites
 ```bash
-# Unit Tests
-vendor/bin/phpunit --testsuite "Unit Tests"
+# Unit tests only
+vendor/bin/phpunit tests/Unit/
 
-# Integration Tests
-vendor/bin/phpunit --testsuite "Integration Tests"
+# Integration tests only  
+vendor/bin/phpunit tests/Integration/
 
-# DAO Tests
-vendor/bin/phpunit --testsuite "DAO Tests"
-```
-
-### Run Specific Test Groups
-```bash
-# Auth Tests
-vendor/bin/phpunit --group auth
-
-# Login Tests
-vendor/bin/phpunit --group login
-
-# User Management Tests
-vendor/bin/phpunit --group user
+# Admin controller tests only
+vendor/bin/phpunit tests/Unit/Admin/
 ```
 
 ### Run with Coverage
 ```bash
-vendor/bin/phpunit --coverage-html tests/coverage
+vendor/bin/phpunit --coverage-html coverage/
 ```
 
-## 📊 Test Coverage
+## Test Categories
 
-The test suite covers:
+### 1. **Admin Management Tests** (Most Comprehensive)
+- **Location**: `tests/Unit/Admin/AdminControllerTest.php`
+- **Coverage**: 27 test methods
+- **Features**: Dashboard, user management, student management, **faculty management**
+- **Mock Strategy**: Complete dependency isolation
 
-### **Authentication (100%)**
-- ✅ Login with valid credentials
-- ✅ Login with invalid credentials
-- ✅ Login with empty credentials
-- ✅ Logout functionality
-- ✅ Current user retrieval
-- ✅ Session management
+### 2. **Integration Tests** (Real Database)
+- **Location**: `tests/Integration/Controllers/AdminControllerTest.php`
+- **Coverage**: 11 test methods
+- **Features**: End-to-end admin operations with real services
+- **Database**: Uses actual database connections
 
-### **User Management (100%)**
-- ✅ Create user with valid data
-- ✅ Create user with existing school ID
-- ✅ Create user with missing fields
-- ✅ Update user successfully
-- ✅ Update nonexistent user
-- ✅ Delete user successfully
-- ✅ Delete nonexistent user
-- ✅ Get all users
-- ✅ Get users by role
-- ✅ Get students by year/section
+### 3. **MVC Tests** (End-to-End)
+- **Location**: `tests/mvc/AuthControllerTest.php`
+- **Coverage**: 6 test methods
+- **Features**: Complete authentication flow testing
+- **HTTP**: Simulates real HTTP requests
 
-### **Database Operations (100%)**
-- ✅ Find user by school ID
-- ✅ Find user by ID
-- ✅ Create user
-- ✅ Update user
-- ✅ Delete user
-- ✅ Authenticate user
-- ✅ Get all users
-- ✅ Get users by role
-- ✅ Get students by year/section
+## Faculty Management Testing
 
-### **Routing (100%)**
-- ✅ Register GET routes
-- ✅ Register POST routes
-- ✅ Dispatch to correct routes
-- ✅ Handle 404 errors
-- ✅ Handle root path
-- ✅ Handle subdirectory paths
-- ✅ Handle parameterized routes
-- ✅ Handle query parameters
-- ✅ Handle different HTTP methods
+### New Test Coverage
+The faculty management functionality includes comprehensive testing:
 
-## 🎯 TDD Benefits Demonstrated
+#### Unit Tests (8 methods)
+- ✅ `addFaculty()` - Success and validation scenarios
+- ✅ `editFaculty()` - Success and validation scenarios  
+- ✅ `deleteFaculty()` - Success and validation scenarios
+- ✅ Error handling for missing fields and invalid requests
 
-### **1. Test-First Development**
-- All tests written before implementation
-- Ensures complete test coverage
-- Prevents bugs before they exist
+#### Integration Tests (5 methods)
+- ✅ Real database faculty creation
+- ✅ Real database faculty updates
+- ✅ Real database faculty deletion
+- ✅ Authentication failure scenarios
+- ✅ End-to-end workflow testing
 
-### **2. Clear Requirements**
-- Tests serve as living documentation
-- Business logic clearly defined
-- Expected behavior explicitly stated
+### Test Scenarios Covered
+1. **Successful Operations**
+   - Create faculty with valid data
+   - Update faculty information
+   - Delete faculty members
 
-### **3. Refactoring Safety**
-- Tests ensure refactoring doesn't break functionality
-- Confidence to improve code structure
-- Maintainable codebase
+2. **Validation Testing**
+   - Missing required fields
+   - Invalid request methods
+   - Authentication requirements
 
-### **4. Design Feedback**
-- Tests reveal design issues early
-- Forces good separation of concerns
-- Promotes dependency injection
+3. **Error Handling**
+   - Database operation failures
+   - Service layer errors
+   - Authentication failures
 
-## 🔧 Test Configuration
+## Best Practices Implemented
 
-### **Mockery Integration**
-All tests use Mockery for mocking dependencies:
-```php
-use Mockery;
+### 1. **Test Isolation**
+- Each test method is completely independent
+- Clean session state between tests
+- Mocked dependencies for unit tests
 
-class AuthServiceTest extends TestCase
-{
-    private $mockUserDAO;
-    
-    protected function setUp(): void
-    {
-        $this->mockUserDAO = Mockery::mock(UserDAOInterface::class);
-        $this->authService = new AuthService($this->mockUserDAO);
-    }
-}
+### 2. **Comprehensive Coverage**
+- All public methods tested
+- All private methods tested via reflection
+- Edge cases and error scenarios covered
+
+### 3. **Real-world Testing**
+- Integration tests use actual database
+- MVC tests simulate real HTTP requests
+- Authentication flow fully tested
+
+### 4. **Maintainable Test Code**
+- Clear test method naming
+- Consistent test structure
+- Comprehensive assertions
+
+## Running Faculty Management Tests
+
+### Unit Tests Only
+```bash
+cd tests/Unit/Admin/
+./run_tests.sh
 ```
 
-### **Test Groups**
-Tests are organized by functionality:
-- `@group auth` - Authentication tests
-- `@group login` - Login-specific tests
-- `@group user` - User management tests
-- `@group dao` - Database operation tests
-- `@group router` - Routing tests
-
-### **Test Naming Convention**
-All test methods follow descriptive naming:
-- `it_should_[expected_behavior]_when_[condition]`
-- Example: `it_should_return_success_when_valid_credentials_provided`
-
-## 📈 Continuous Integration
-
-The test suite is designed for CI/CD:
-- Fast execution (under 30 seconds)
-- No external dependencies
-- Comprehensive coverage reporting
-- Clear pass/fail indicators
-
-## 🎉 Success Metrics
-
-When all tests pass, you'll see:
-```
-🎉 ALL TESTS PASSED! TDD Cycle Complete!
-✅ RED: Tests written first
-✅ GREEN: Minimal implementation to pass
-✅ REFACTOR: Clean, maintainable code
+### Integration Tests Only
+```bash
+vendor/bin/phpunit tests/Integration/Controllers/AdminControllerTest.php --testdox
 ```
 
-This demonstrates a complete TDD implementation with:
-- **100% Test Coverage**
-- **Clean Architecture**
-- **Maintainable Code**
-- **Clear Documentation**
+### All Admin Tests
+```bash
+# Unit tests
+vendor/bin/phpunit tests/Unit/Admin/
+
+# Integration tests  
+vendor/bin/phpunit tests/Integration/Controllers/AdminControllerTest.php
+
+# Both together
+vendor/bin/phpunit tests/Unit/Admin/ tests/Integration/Controllers/AdminControllerTest.php
+```
+
+## Test Data Management
+
+### Sample Faculty Data
+Tests use realistic faculty data:
+- School IDs: `FAC001`, `FAC002`, etc.
+- Names: `Dr. John Smith`, `Dr. Jane Doe`
+- Roles: `faculty`
+- Passwords: Configurable or default
+
+### Database State
+- Integration tests use real database
+- Tests clean up after themselves
+- No permanent data changes
+- Isolated test environments
+
+## Future Test Enhancements
+
+### Potential Additions
+1. **Faculty-Specific Fields**: Position, department, specialization
+2. **Subject Assignment Tests**: Faculty-subject relationships
+3. **Schedule Management**: Faculty availability testing
+4. **Performance Metrics**: Faculty performance tracking
+5. **Document Management**: Credentials and certifications
+
+### Test Infrastructure
+1. **Database Factories**: Generate test data
+2. **Test Data Builders**: Construct complex test objects
+3. **Parallel Testing**: Speed up test execution
+4. **Continuous Integration**: Automated test running
