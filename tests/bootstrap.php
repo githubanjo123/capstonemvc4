@@ -14,24 +14,10 @@ if (ob_get_level() === 0) {
 // Set up test environment
 $_ENV['APP_ENV'] = 'testing';
 
-// Ensure sessions can start properly in tests
-if (session_status() === PHP_SESSION_NONE) {
-    // Use a test session directory
-    $testSessionDir = sys_get_temp_dir() . '/phpunit_sessions_' . uniqid();
-    if (!is_dir($testSessionDir)) {
-        mkdir($testSessionDir, 0777, true);
-    }
-    ini_set('session.save_path', $testSessionDir);
-    ini_set('session.use_cookies', '0');
-    ini_set('session.use_only_cookies', '0');
-    ini_set('session.cache_limiter', '');
-}
-
-// Clean up any existing session data
-if (session_status() === PHP_SESSION_ACTIVE) {
-    session_unset();
-    session_destroy();
-}
+// Configure session settings for testing (but don't start sessions automatically)
+ini_set('session.use_cookies', '0');
+ini_set('session.use_only_cookies', '0');
+ini_set('session.cache_limiter', '');
 
 // Reset superglobals for clean test state
 $_SESSION = [];

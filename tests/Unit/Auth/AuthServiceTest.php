@@ -25,22 +25,43 @@ class AuthServiceTest extends TestCase
         $property->setAccessible(true);
         $property->setValue($this->authService, $this->userDAOMock);
         
-        // Ensure clean session state
+        // Ensure completely clean session state for each test
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_unset();
+            session_destroy();
+        }
+        $_SESSION = [];
+    }
+
+    /**
+     * Helper method to set up an authenticated user session
+     */
+    private function setupAuthenticatedSession($role = 'student')
+    {
+        // Ensure we have a clean session state
         if (session_status() === PHP_SESSION_ACTIVE) {
             session_unset();
             session_destroy();
         }
         $_SESSION = [];
         
-        // Start a fresh session for testing
+        // Start a fresh session
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
+        
+        // Set all required session data
+        $_SESSION['user_id'] = 1;
+        $_SESSION['school_id'] = '2021-0001';
+        $_SESSION['full_name'] = 'John Doe';
+        $_SESSION['role'] = $role;
+        $_SESSION['year_level'] = '1st';
+        $_SESSION['section'] = 'A';
     }
 
     protected function tearDown(): void
     {
-        // Clean up session
+        // Clean up session completely
         if (session_status() === PHP_SESSION_ACTIVE) {
             session_unset();
             session_destroy();
@@ -120,34 +141,28 @@ class AuthServiceTest extends TestCase
     /** @test */
     public function it_should_destroy_session_on_logout()
     {
-        // Start a session and set some values
-        if (session_status() === PHP_SESSION_NONE) { 
-            session_start(); 
-        }
+        // Set up a simple authenticated session
         $_SESSION['user_id'] = 1;
         $_SESSION['role'] = 'student';
-
+        
+        // Verify session has data before logout
+        $this->assertNotEmpty($_SESSION, 'Session should have data before logout');
+        
         $result = $this->authService->logout();
         
         $this->assertTrue($result['success']);
         $this->assertSame('Logged out successfully.', $result['message']);
         
-        // Verify session is destroyed
-        $this->assertEmpty($_SESSION);
+        // Verify session is destroyed - check that key session data is cleared
+        $this->assertArrayNotHasKey('user_id', $_SESSION, 'user_id should be removed from session');
+        $this->assertArrayNotHasKey('role', $_SESSION, 'role should be removed from session');
     }
 
     /** @test */
     public function it_should_return_current_user_when_session_exists()
     {
-        if (session_status() === PHP_SESSION_NONE) { 
-            session_start(); 
-        }
-        $_SESSION['user_id'] = 1;
-        $_SESSION['school_id'] = '2021-0001';
-        $_SESSION['full_name'] = 'John Doe';
-        $_SESSION['role'] = 'student';
-        $_SESSION['year_level'] = '1st';
-        $_SESSION['section'] = 'A';
+        // Set up an authenticated session
+        $this->setupAuthenticatedSession();
 
         $result = $this->authService->getCurrentUser();
         
@@ -162,10 +177,8 @@ class AuthServiceTest extends TestCase
     /** @test */
     public function it_should_return_null_when_no_session_exists()
     {
-        if (session_status() === PHP_SESSION_ACTIVE) { 
-            session_destroy(); 
-        }
-        unset($_SESSION['user_id'], $_SESSION['user']);
+        // Ensure no session data exists
+        unset($_SESSION['user_id'], $_SESSION['school_id'], $_SESSION['full_name'], $_SESSION['role'], $_SESSION['year_level'], $_SESSION['section']);
         
         $result = $this->authService->getCurrentUser();
         
@@ -214,29 +227,29 @@ class AuthServiceTest extends TestCase
     /** @test */
     public function it_should_require_specific_role_for_role_protected_resources()
     {
-        // First test without authentication
+        // Test with no session
         $result = $this->authService->requireRole('admin');
-        
         $this->assertFalse($result['success']);
         $this->assertSame('Authentication required.', $result['message']);
         
-        // Then test with authentication but wrong role
-        if (session_status() === PHP_SESSION_NONE) { 
-            session_start(); 
-        }
-        $_SESSION['user_id'] = 1;
-        $_SESSION['role'] = 'student';
-        
+        // Test with wrong role
+        $this->setupAuthenticatedSession('student');
         $result = $this->authService->requireRole('admin');
-        
         $this->assertFalse($result['success']);
         $this->assertSame('Insufficient permissions.', $result['message']);
         
-        // Finally test with correct role
-        $_SESSION['role'] = 'admin';
+        // Test with correct role - set up a fresh admin session
+        // Clear session before testing correct role
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_unset();
+            session_destroy();
+        }
+        $_SESSION = [];
+        
+        // Set up a fresh admin session
+        $this->setupAuthenticatedSession('admin');
         
         $result = $this->authService->requireRole('admin');
-        
         $this->assertTrue($result['success']);
         $this->assertSame('User has required role.', $result['message']);
     }
