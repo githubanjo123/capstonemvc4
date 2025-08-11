@@ -8,9 +8,9 @@ class AuthService
 {
     private $userDAO;
 
-    public function __construct()
+    public function __construct(UserDAO $userDAO = null)
     {
-        $this->userDAO = new UserDAO();
+        $this->userDAO = $userDAO ?? new UserDAO();
     }
 
     /**
