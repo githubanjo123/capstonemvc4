@@ -36,9 +36,8 @@ The `AdminControllerTest` covers **27 test methods** including:
 - `showSuccess()` - Success message display
 - `showError()` - Error message display
 
-### Helper Methods (2 tests)
+### Helper Methods (1 test)
 - `redirectToDashboard()` - Dashboard redirection
-- `requireAuth()` - Authentication requirement
 
 ## Test Scenarios
 
@@ -64,6 +63,14 @@ The `AdminControllerTest` covers **27 test methods** including:
 - ✅ Edit faculty with missing fields
 - ✅ Delete faculty successfully
 - ✅ Delete faculty without user ID
+
+## Recent Fixes
+
+### Issue Resolved ✅
+- **Problem**: Tests were only running 6 methods instead of 27
+- **Root Cause**: Faculty tests were incorrectly using `invokePrivateMethod()` for public methods
+- **Solution**: Changed faculty tests to call public methods directly on controller instance
+- **Result**: All 27 tests now run properly
 
 ### General User Management Tests
 - ✅ Add user with valid data

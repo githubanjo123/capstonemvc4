@@ -30,6 +30,7 @@ This project uses PHPUnit for testing with a comprehensive test suite covering u
 ### Recent Additions
 - **Faculty Management Tests**: 7 new unit tests + 5 new integration tests
 - **Complete CRUD Coverage**: Add, edit, delete operations for both students and faculty
+- **Test Discovery Fix**: Resolved issue where only 6 tests were running instead of 27
 
 ## Running Tests
 
