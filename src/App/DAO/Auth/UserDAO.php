@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Models;
+namespace App\DAO\Auth;
 
 use App\Config\Database;
+use App\Interfaces\UserDAOInterface;
 use PDO;
 use PDOException;
 
-class User
+class UserDAO implements UserDAOInterface
 {
     private $db;
     private $table = 'users';
@@ -31,21 +32,16 @@ class User
     }
 
     /**
-     * Authenticate user
+     * Find user by ID
      */
-    public function authenticate($school_id, $password)
+    public function findById($user_id)
     {
-        $user = $this->findBySchoolId($school_id);
-        
-        if (!$user) {
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE user_id = ?");
+            $stmt->execute([$user_id]);
+            return $stmt->fetch();
+        } catch (PDOException $e) {
             return false;
-        }
-
-        // Check if password is hashed (starts with $) or plain text
-        if (strpos($user['password'], '$') === 0) {
-            return password_verify($password, $user['password']) ? $user : false;
-        } else {
-            return $password === $user['password'] ? $user : false;
         }
     }
 
@@ -157,16 +153,21 @@ class User
     }
 
     /**
-     * Find user by ID
+     * Authenticate user
      */
-    public function findById($user_id)
+    public function authenticate($school_id, $password)
     {
-        try {
-            $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE user_id = ?");
-            $stmt->execute([$user_id]);
-            return $stmt->fetch();
-        } catch (PDOException $e) {
+        $user = $this->findBySchoolId($school_id);
+        
+        if (!$user) {
             return false;
+        }
+
+        // Check if password is hashed (starts with $) or plain text
+        if (strpos($user['password'], '$') === 0) {
+            return password_verify($password, $user['password']) ? $user : false;
+        } else {
+            return $password === $user['password'] ? $user : false;
         }
     }
 }

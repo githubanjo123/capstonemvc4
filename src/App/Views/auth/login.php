@@ -4,85 +4,112 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Examination System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+        }
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .login-header h1 {
+            color: #333;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .login-header p {
+            color: #666;
+            font-size: 1rem;
+        }
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .btn-login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
-<div class="min-h-screen flex items-center justify-center">
-  <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
-    <div class="flex flex-col items-center mb-6">
-      <img src="logo.png" alt="Logo" class="w-16 h-16 mb-4 rounded-xl shadow-md bg-gray-50 border border-gray-200">
-      <h2 class="text-2xl font-bold text-gray-900 mb-2">Account Login</h2>
-      <p class="text-gray-500 text-sm">Enter your credentials to access your dashboard.</p>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="login-card">
+                    <div class="login-header">
+                        <h1>Examination System</h1>
+                        <p>Please sign in to continue</p>
+                    </div>
+
+                    <?php if (isset($error)): ?>
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <?= htmlspecialchars($error) ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <form action="<?= dirname($_SERVER['SCRIPT_NAME']) ?>/api/auth/login" method="POST">
+                        <div class="mb-3">
+                            <label for="school_id" class="form-label">School ID</label>
+                            <input type="text" class="form-control" id="school_id" name="school_id" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <button type="submit" class="btn btn-login">Sign In</button>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            Demo Accounts:<br>
+                            Admin: admin123 / password123<br>
+                            Faculty: faculty123 / password123<br>
+                            Student: student123 / password123
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <form id="loginForm" class="space-y-5">
-      <div>
-        <label class="block mb-1 text-gray-700 font-medium" for="school_id">School ID / Username</label>
-        <input
-          type="text"
-          name="school_id"
-          id="school_id"
-          class="w-full px-4 py-2 rounded-xl border border-gray-300 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black text-gray-900"
-          placeholder="Enter your ID or username"
-          required
-        >
-      </div>
-      <div>
-        <label class="block mb-1 text-gray-700 font-medium" for="password">Password</label>
-        <input
-          type="password"
-          name="password"
-          id="password"
-          class="w-full px-4 py-2 rounded-xl border border-gray-300 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black text-gray-900"
-          placeholder="Enter your password"
-          required
-        >
-      </div>
-      <button
-        type="submit"
-        class="w-full py-2 mt-2 bg-black text-white font-semibold rounded-xl hover:bg-gray-900 transition"
-      >
-        ⇨ Login
-      </button>
-      <div id="loginMessage" class="text-center text-sm mt-2"></div>
-    </form>
-  </div>
-</div>
 
-<script>
-document.getElementById("loginForm").onsubmit = async function (e) {
-  e.preventDefault();
-  const formData = new FormData(this);
-  const msg = document.getElementById("loginMessage");
-  msg.textContent = "";
-  msg.className = "text-center text-sm mt-2";
-
-  try {
-    const response = await fetch("../api/auth/login.php", {
-      method: "POST",
-      body: formData,
-      credentials: "include"
-    });
-
-    if (!response.ok) throw new Error("Network error: " + response.status);
-
-    const result = await response.json();
-    msg.textContent = result.message;
-
-    if (result.status === "success") {
-      msg.className += " text-green-600";
-      setTimeout(() => {
-        // Redirect back to login page which will show welcome message for logged in users
-        window.location.href = "login_mvc.php";
-      }, 1200);
-    } else {
-      msg.className += " text-red-600";
-    }
-
-  } catch (error) {
-    msg.textContent = "Login failed: " + error.message;
-    msg.className += " text-red-600";
-  }
-  };
-</script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 </body>
 </html>

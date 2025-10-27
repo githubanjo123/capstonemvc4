@@ -1,36 +1,98 @@
 <?php
-require_once __DIR__ . '/../vendor/autoload.php';
 
-use App\Core\Router;
-use App\Core\View;
-
-// Start session
 session_start();
 
-// Create router instance
+require_once '../vendor/autoload.php';
+
+use App\Core\Router;
+use App\Controllers\Auth\AuthController;
+use App\Controllers\Admin\AdminController;
+
+// Initialize router
 $router = new Router();
 
-// Define routes
+// Create controllers
+$authController = new AuthController();
+$adminController = new AdminController();
+
+// Debug information (remove this later)
+$currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+error_log("Requested path: " . $currentPath);
+
+// Root route - redirect to login
 $router->get('/', function() {
-    // Redirect to login page
-    header("Location: login_mvc.php");
+    header('Location: /login');
     exit;
 });
 
-$router->get('/login', function() {
-    // If user is already logged in, show welcome message
-    if (isset($_SESSION['user_id'])) {
-        $role = $_SESSION['role'] ?? 'student';
-        echo "<h1>Welcome! You are logged in as: " . htmlspecialchars($role) . "</h1>";
-        echo "<p><a href='../api/auth/logout.php'>Logout</a></p>";
-        exit;
-    }
-    
-    // Show login page
-    $view = new View();
-    $view->display('auth.login', [
-        'title' => 'Login - Examination System'
-    ]);
+// Login page
+$router->get('/login', function() use ($authController) {
+    $authController->showLogin();
+});
+
+// API routes for authentication
+$router->post('/api/auth/login', function() use ($authController) {
+    $authController->login();
+});
+
+$router->post('/api/auth/logout', function() use ($authController) {
+    $authController->logout();
+});
+
+// Success pages for each role
+$router->get('/admin-success', function() {
+    $basePath = dirname($_SERVER['SCRIPT_NAME']);
+    echo '<h1>Admin Login Successful!</h1>';
+    echo '<p>Welcome Admin! You have successfully logged in.</p>';
+    echo '<p><a href="' . $basePath . '/login">Back to Login</a></p>';
+});
+
+$router->get('/faculty-success', function() {
+    $basePath = dirname($_SERVER['SCRIPT_NAME']);
+    echo '<h1>Faculty Login Successful!</h1>';
+    echo '<p>Welcome Faculty! You have successfully logged in.</p>';
+    echo '<p><a href="' . $basePath . '/login">Back to Login</a></p>';
+});
+
+$router->get('/student-success', function() {
+    $basePath = dirname($_SERVER['SCRIPT_NAME']);
+    echo '<h1>Student Login Successful!</h1>';
+    echo '<p>Welcome Student! You have successfully logged in.</p>';
+    echo '<p><a href="' . $basePath . '/login">Back to Login</a></p>';
+});
+
+// Admin Dashboard Routes
+$router->get('/admin/dashboard', function() use ($adminController) {
+    $adminController->dashboard();
+});
+
+$router->get('/admin/logout', function() use ($adminController) {
+    $adminController->logout();
+});
+
+// Admin User Management Routes
+$router->post('/admin/users/add', function() use ($adminController) {
+    $adminController->addUser();
+});
+
+$router->post('/admin/users/add-student', function() use ($adminController) {
+    $adminController->addStudent();
+});
+
+$router->post('/admin/users/edit-student', function() use ($adminController) {
+    $adminController->editStudent();
+});
+
+$router->post('/admin/users/edit/{id}', function($id) use ($adminController) {
+    $adminController->editUser($id);
+});
+
+$router->post('/admin/users/delete-student', function() use ($adminController) {
+    $adminController->deleteStudent();
+});
+
+$router->post('/admin/users/delete/{id}', function($id) use ($adminController) {
+    $adminController->deleteUser($id);
 });
 
 // Handle the request
